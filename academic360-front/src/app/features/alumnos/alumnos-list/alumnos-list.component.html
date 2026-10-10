@@ -1,0 +1,100 @@
+<div class="max-w-7xl mx-auto">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-white">Listado de Alumnos</h2>
+      <p class="text-gray-400 text-sm mt-1">Gestión del directorio de alumnos</p>
+    </div>
+    <button routerLink="/alumnos/nuevo" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow flex items-center transition-colors">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+      Nuevo Alumno
+    </button>
+  </div>
+
+  <!-- Buscador Global con borde acento estilo Visual Studio -->
+  <div class="bg-gray-800 p-4 rounded-lg mb-6 flex flex-wrap gap-4 items-end"
+       style="border: 1px solid #a855f7; box-shadow: 0 0 8px rgba(168, 85, 247, 0.2);">
+    <div class="flex-1 min-w-[200px]">
+      <label class="block text-sm font-medium text-gray-300 mb-1">Criterio de búsqueda</label>
+      <input type="text" [(ngModel)]="filtroGlobal" (keyup.enter)="buscar()"
+             class="w-full bg-gray-700 rounded-md text-white px-3 py-2 focus:outline-none"
+             style="border: 1px solid #a855f7;"
+             placeholder="Ingrese un texto para buscar en cualquier columna...">
+    </div>
+    <button (click)="buscar()" class="bg-gray-600 hover:bg-gray-500 text-white px-6 py-2 rounded-md shadow transition-colors">
+      Buscar
+    </button>
+    <button (click)="cargarTodos()" class="bg-gray-600 hover:bg-gray-500 text-white px-6 py-2 rounded-md shadow transition-colors">
+      Todos
+    </button>
+  </div>
+
+  <!-- Alerta de Errores -->
+  <div *ngIf="mensajeError" class="mb-4 bg-red-900 border border-red-500 text-red-200 px-4 py-3 rounded relative" role="alert">
+    <span class="block sm:inline">{{ mensajeError }}</span>
+    <button (click)="mensajeError = ''" class="absolute top-0 bottom-0 right-0 px-4 py-3">
+      <svg class="fill-current h-6 w-6 text-red-400" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Cerrar</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+    </button>
+  </div>
+
+  <!-- Grilla de Datos con borde acento exterior y divisiones -->
+  <div class="bg-gray-800 rounded-lg"
+       style="border: 1px solid #a855f7; box-shadow: 0 0 8px rgba(168, 85, 247, 0.2);">
+    <div class="overflow-x-auto rounded-t-lg">
+      <table class="w-full table-fixed">
+        <thead class="bg-gray-750 text-gray-200" style="border-bottom: 1px solid #a855f7;">
+          <tr>
+            <th class="w-[12%] px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Código</th>
+            <th class="w-[33%] px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Alumno</th>
+            <th class="w-[15%] px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Teléfono</th>
+            <th class="w-[25%] px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Email</th>
+            <th class="w-[8%] px-6 py-3 text-center text-xs font-bold uppercase tracking-wider">Estado</th>
+            <th class="w-[7%] px-6 py-3 text-center text-xs font-bold uppercase tracking-wider">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-700/60 text-gray-300">
+          <tr *ngFor="let alumno of alumnos" [ngClass]="{'bg-red-900 bg-opacity-20 text-red-300': alumno.estado === 'I'}" class="hover:bg-gray-750 transition-colors">
+            <td class="px-6 py-4 text-sm font-medium truncate" [title]="alumno.codigo">{{alumno.codigo}}</td>
+            <td class="px-6 py-4 text-sm truncate" [title]="alumno.nombreCompleto">{{alumno.nombreCompleto}}</td>
+            <td class="px-6 py-4 text-sm truncate" [title]="alumno.telefono">{{alumno.telefono}}</td>
+            <td class="px-6 py-4 text-sm truncate" [title]="alumno.email">{{alumno.email}}</td>
+            <td class="px-6 py-4 text-sm text-center">
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                    [ngClass]="{'bg-green-900 text-green-300': alumno.estado === 'A', 'bg-red-900 text-red-300': alumno.estado === 'I', 'bg-gray-600 text-gray-300': alumno.estado === 'X'}">
+                {{alumno.estadoNombre}}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-sm text-center">
+              <button (click)="eliminar(alumno)" class="text-red-400 hover:text-red-300 transition-colors" title="Eliminar">
+                <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="alumnos.length === 0">
+            <td colspan="6" class="px-6 py-8 text-center text-gray-500">No se encontraron registros.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginador Integrado con división púrpura -->
+    <div class="flex justify-between items-center px-6 py-3 bg-gray-700 rounded-b-lg" style="border-top: 1px solid #a855f7;">
+      <div class="text-sm text-gray-300">
+        Mostrando <span class="font-medium text-white">{{ totalCount === 0 ? 0 : (pageNumber - 1) * pageSize + 1 }}</span> a
+        <span class="font-medium text-white">{{ mathMin(pageNumber * pageSize, totalCount) }}</span> de
+        <span class="font-medium text-white">{{ totalCount }}</span> resultados
+      </div>
+      <div class="flex space-x-2">
+        <button (click)="cambiarPagina(pageNumber - 1)" [disabled]="pageNumber === 1"
+                class="px-3 py-1 bg-gray-600 text-white rounded border border-gray-500 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+          Anterior
+        </button>
+        <button (click)="cambiarPagina(pageNumber + 1)" [disabled]="pageNumber === totalPages || totalPages === 0"
+                class="px-3 py-1 bg-gray-600 text-white rounded border border-gray-500 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+          Siguiente
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+

@@ -1,0 +1,144 @@
+<div class="max-w-7xl mx-auto pb-8">
+  <div class="mb-6">
+    <h2 class="text-2xl font-bold text-white">Matrícula de alumnos</h2>
+    <p class="text-gray-400 text-sm mt-1">Gestión de pre-matrículas e inscripciones</p>
+  </div>
+
+  <!-- Sección superior: Filtros en Cascada (Similar al VB6) -->
+  <div class="bg-gray-800 p-5 rounded-lg shadow-lg mb-6 ring-1 ring-purple-500">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+
+      <!-- SubTipo (cboSubTipo) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-1">Subtipo:</label>
+        <select [(ngModel)]="subTipoSeleccionado" (change)="onSubTipoChange()" class="w-full bg-gray-700 border border-gray-600 rounded-md text-white px-3 py-2 focus:outline-none focus:ring-1 focus:ring-purple-500">
+          <option [ngValue]="null">-- Ninguno --</option>
+          <!-- CORRECCIÓN: Usando st.subTipoNombre -->
+          <option *ngFor="let st of subTipos" [ngValue]="st">{{st.subTipoNombre}}</option>
+        </select>
+      </div>
+
+      <!-- Producto (cboProducto) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-1">Producto:</label>
+        <select [(ngModel)]="idProductoSeleccionado" (change)="onProductoChange()" [disabled]="productos.length === 0" class="w-full bg-gray-700 border border-gray-600 rounded-md text-white px-3 py-2 focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50">
+          <option [value]="0">-- Seleccione --</option>
+          <option *ngFor="let prod of productos" [value]="prod.id">{{prod.nombre}}</option>
+        </select>
+      </div>
+
+      <!-- Promoción (cboPromocion) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-1">Promoción:</label>
+        <select [(ngModel)]="idPromocionSeleccionada" (change)="onPromocionChange()" [disabled]="promociones.length === 0" class="w-full bg-gray-700 border border-gray-600 rounded-md text-white px-3 py-2 focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50">
+          <option [value]="0">-- Seleccione --</option>
+          <option *ngFor="let promo of promociones" [value]="promo.id">{{promo.codigo}} - {{promo.nombre}}</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Panel de Detalles de Promoción (Solo visible si hay promoción seleccionada) -->
+    <div *ngIf="promocionActual" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 pt-4 border-t border-gray-700">
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide">Nombre de la promoción</label>
+        <div class="mt-1 p-2 bg-gray-900 text-gray-200 rounded-md">{{ promocionActual.nombre }}</div>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide">Dirigido a</label>
+        <div class="mt-1 p-2 bg-gray-900 text-gray-200 rounded-md">{{ promocionActual.dirigido }}</div>
+      </div>
+    </div>
+
+    <!-- Pestañas de Estado (Ribbon) -->
+    <div class="flex items-end mt-4">
+      <div class="flex space-x-2 p-1 bg-gray-900 rounded-lg">
+        <button (click)="cambiarFiltroEstado(0)" [ngClass]="{'bg-purple-600 text-white': estadoFiltro === 0, 'text-gray-400 hover:text-white hover:bg-gray-700': estadoFiltro !== 0}" class="px-4 py-2 rounded-md text-sm font-medium transition-colors">
+          Nuevos
+        </button>
+        <button (click)="cambiarFiltroEstado(1)" [ngClass]="{'bg-purple-600 text-white': estadoFiltro === 1, 'text-gray-400 hover:text-white hover:bg-gray-700': estadoFiltro !== 1}" class="px-4 py-2 rounded-md text-sm font-medium transition-colors">
+          Matriculados
+        </button>
+        <button (click)="cambiarFiltroEstado(2)" [ngClass]="{'bg-purple-600 text-white': estadoFiltro === 2, 'text-gray-400 hover:text-white hover:bg-gray-700': estadoFiltro !== 2}" class="px-4 py-2 rounded-md text-sm font-medium transition-colors">
+          Todos
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buscador Global -->
+  <div class="flex gap-4 mb-6">
+    <input type="text" [(ngModel)]="filtroGlobal" (keyup.enter)="buscar()" class="flex-1 bg-gray-700 border border-gray-600 rounded-md text-white px-4 py-2 focus:outline-none focus:ring-1 focus:ring-purple-500" placeholder="Buscar por alumno, grupo o sección...">
+    <button (click)="buscar()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md shadow transition-colors">Buscar</button>
+  </div>
+
+  <!-- Alerta de Errores -->
+  <div *ngIf="mensajeError" class="mb-4 bg-red-900 border border-red-500 text-red-200 px-4 py-3 rounded relative">
+    <span class="block sm:inline">{{ mensajeError }}</span>
+  </div>
+
+  <!-- Grilla de Datos -->
+  <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden ring-1 ring-purple-500">
+    <div class="overflow-x-auto">
+      <table class="w-full table-fixed">
+        <thead class="bg-gray-750 text-gray-200 border-b border-purple-500">
+          <tr>
+            <th class="w-[30%] px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Alumno</th>
+            <th class="w-[10%] px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Grupo</th>
+            <th class="w-[25%] px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Curso - Sección</th>
+            <th class="w-[10%] px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Fecha</th>
+            <th class="w-[12%] px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Usuario</th>
+            <th class="w-[13%] px-4 py-3 text-center text-xs font-bold uppercase tracking-wider">Acción</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-750 text-gray-300">
+          <tr *ngFor="let alumno of alumnos" class="hover:bg-gray-750 transition-colors">
+
+            <td class="px-4 py-4 text-sm font-medium truncate flex items-center">
+              <svg *ngIf="alumno.esMatricula" class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              <svg *ngIf="!alumno.esMatricula" class="w-5 h-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              {{alumno.nombreCompleto}}
+            </td>
+
+            <td class="px-4 py-4 text-sm truncate" [title]="alumno.grupoCodigo">{{alumno.grupoCodigo}}</td>
+            <td class="px-4 py-4 text-sm truncate" [title]="alumno.seccion">{{alumno.seccion}}</td>
+            <td class="px-4 py-4 text-sm">{{alumno.matriculaFecha | date:'dd/MM/yyyy'}}</td>
+            <td class="px-4 py-4 text-sm">{{alumno.matriculadoPor}}</td>
+
+            <td class="px-4 py-4 text-sm text-center">
+              <button (click)="toggleMatricula(alumno)"
+                [ngClass]="alumno.esMatricula ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'"
+                class="text-white px-3 py-1.5 rounded-md shadow text-xs transition-colors w-full">
+                {{ alumno.esMatricula ? 'Deshacer' : 'Matricular' }}
+              </button>
+            </td>
+
+          </tr>
+          <tr *ngIf="alumnos.length === 0">
+            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+              <span *ngIf="idPromocionSeleccionada === 0">Seleccione una promoción para ver los alumnos.</span>
+              <span *ngIf="idPromocionSeleccionada > 0">No se encontraron registros para los filtros seleccionados.</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex justify-between items-center px-6 py-3 bg-gray-700 border-t border-purple-500">
+      <div class="text-sm text-gray-300">
+        Mostrando <span class="font-medium text-white">{{ totalCount === 0 ? 0 : (pageNumber - 1) * pageSize + 1 }}</span> a
+        <span class="font-medium text-white">{{ mathMin(pageNumber * pageSize, totalCount) }}</span> de
+        <span class="font-medium text-white">{{ totalCount }}</span> resultados
+      </div>
+      <div class="flex space-x-2">
+        <button (click)="cambiarPagina(pageNumber - 1)" [disabled]="pageNumber === 1"
+                class="px-3 py-1 bg-gray-600 text-white rounded border border-gray-500 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+          Anterior
+        </button>
+        <button (click)="cambiarPagina(pageNumber + 1)" [disabled]="pageNumber === totalPages || totalPages === 0"
+                class="px-3 py-1 bg-gray-600 text-white rounded border border-gray-500 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+          Siguiente
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

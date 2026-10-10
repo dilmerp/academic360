@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Academic360.Api/Academic360.Api.csproj" />
+    <Project Path="src/Academic360.Application/Academic360.Application.csproj" />
+    <Project Path="src/Academic360.Domain/Academic360.Domain.csproj" />
+    <Project Path="src/Academic360.Infrastructure/Academic360.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Academic360.Tests/Academic360.Tests.csproj" />
+  </Folder>
+</Solution>

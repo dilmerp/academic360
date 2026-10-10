@@ -1,0 +1,124 @@
+import { Component, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AlumnoService } from '../../services/alumno.service';
+import { CrearAlumnoRequestDto } from '../../models/alumno.model';
+import { HttpErrorResponse } from '@angular/common/http';
+
+@Component({
+  selector: 'app-alumno-form',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './alumno-form.component.html',
+  styleUrls: ['./alumno-form.component.css']
+})
+export class AlumnoFormComponent {
+  private readonly fb = inject(FormBuilder);
+  private readonly alumnoService = inject(AlumnoService);
+
+  // Signals para estado
+  isSubmitting = signal<boolean>(false);
+  errorMessage = signal<string>('');
+  successMessage = signal<string>('');
+  requiresHomologoConfirmation = signal<boolean>(false);
+
+  // Signal para manejar las pestañas (1: Personales, 2: Contacto, 3: Identidad, 4: Credenciales)
+  activeTab = signal<number>(1);
+
+  alumnoForm: FormGroup = this.fb.group({
+    usuario: ['', Validators.required],
+    contrasena: ['', Validators.required],
+    paterno: ['', [Validators.required, Validators.maxLength(50)]],
+    materno: ['', Validators.maxLength(50)],
+    nombres: ['', [Validators.required, Validators.maxLength(50)]],
+    idTenor: [0, [Validators.required, Validators.min(1)]],
+    sexo: [true, Validators.required],
+    idCivil: [0, [Validators.required, Validators.min(1)]],
+    email: ['', [Validators.required, Validators.email]],
+    emailOpcional: ['', Validators.email],
+    fechaNacimiento: ['', Validators.required],
+    idPaisNacimiento: [166, [Validators.required, Validators.min(1)]], // 166 = Perú por defecto
+    idUbigeoNacimiento: [''],
+    idUbigeoNacimientoOtro: [''],
+    telefono: [''],
+    celular: [''],
+    telefonoReferencial: [''],
+    direccion: ['', Validators.required],
+    urbanizacion: [''],
+    direccionReferencia: [''],
+    idPais: [166, [Validators.required, Validators.min(1)]],
+    idUbigeo: [''],
+    idUbigeoResidenciaOtro: [''],
+    idNacionalidad: [166, Validators.min(1)],
+    codigoPostal: [''],
+    idDocumento: [0, Validators.min(1)],
+    numeroDocumento: [''],
+    ruc: ['', [Validators.pattern('^\\d{11}$')]],
+    trabaja: [false],
+    estado: ['A'],
+    idPeriodo: [1]
+  });
+
+  setTab(tabIndex: number) {
+    this.activeTab.set(tabIndex);
+  }
+
+  nextTab() {
+    if (this.activeTab() < 4) {
+      this.activeTab.set(this.activeTab() + 1);
+    }
+  }
+
+  previousTab() {
+    if (this.activeTab() > 1) {
+      this.activeTab.set(this.activeTab() - 1);
+    }
+  }
+
+  onSubmit(forceHomologo: boolean = false) {
+    if (this.alumnoForm.invalid) {
+      this.alumnoForm.markAllAsTouched();
+      this.errorMessage.set('Por favor, revise las pestañas. Complete todos los campos obligatorios correctamente.');
+      return;
+    }
+
+    this.isSubmitting.set(true);
+    this.errorMessage.set('');
+    this.successMessage.set('');
+    this.requiresHomologoConfirmation.set(false);
+
+    const formData: CrearAlumnoRequestDto = this.alumnoForm.value;
+
+    this.alumnoService.crearAlumno(formData, forceHomologo).subscribe({
+      next: (response: { id: number }) => {
+        this.successMessage.set(`¡Alumno registrado correctamente! ID Actor generado: ${response.id}`);
+        this.alumnoForm.reset({ sexo: true, idPaisNacimiento: 166, idPais: 166, idNacionalidad: 166, estado: 'A', idPeriodo: 1, trabaja: false });
+        this.isSubmitting.set(false);
+        this.activeTab.set(1);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.isSubmitting.set(false);
+        if (error.status === 409) {
+          this.errorMessage.set('Atención: El alumno ya está registrado (Homónimo). ¿Desea guardarlo de todas formas?');
+          this.requiresHomologoConfirmation.set(true);
+        } else if (error.status === 400 && error.error?.errors) {
+          // Captura errores de FluentValidation del backend
+          const validationErrors = Object.values(error.error.errors).flat().join(' | ');
+          this.errorMessage.set(`Validación fallida: ${validationErrors}`);
+        } else {
+          // Muestra el mensaje técnico real (ej. Error 500 de SQL Server o CORS)
+          this.errorMessage.set(`Error del Servidor (${error.status}): ${error.error?.detail || error.message}`);
+        }
+      }
+    });
+  }
+
+  confirmarHomologo() {
+    this.onSubmit(true);
+  }
+
+  cancelarHomologo() {
+    this.requiresHomologoConfirmation.set(false);
+    this.errorMessage.set('');
+  }
+}
