@@ -21,10 +21,23 @@ RUN dotnet publish "Academic360.Api.csproj" -c Release -o /app/publish /p:UseApp
 # Etapa de ejecución
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
+
+# --- MEJORA DE INFRAESTRUCTURA Y SEGURIDAD ---
+# 1. Instalamos libgssapi-krb5-2 para solucionar el error de Supabase/Postgres.
+# 2. rm -rf /var/lib/apt/lists/* elimina los archivos temporales de apt-get para mantener la imagen ligera.
+RUN apt-get update \
+    && apt-get install -y libgssapi-krb5-2 \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --from=build /app/publish .
 
-# Render usa el puerto 8080 por defecto
+# Render usa el puerto 8080 por defecto en .NET modernos
 EXPOSE 8080
 ENV ASPNETCORE_URLS=http://+:8080
+
+# --- OWASP: PRINCIPIO DE MENOR PRIVILEGIO ---
+# Cambiamos del usuario 'root' (por defecto) al usuario sin privilegios 'app'.
+# Esto mitiga severamente el impacto si el contenedor es comprometido.
+USER app
 
 ENTRYPOINT ["dotnet", "Academic360.Api.dll"]
