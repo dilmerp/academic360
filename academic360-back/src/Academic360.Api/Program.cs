@@ -1,39 +1,79 @@
-using System.Text;
 using Academic360.Api.Services;
 using Academic360.Application;
 using Academic360.Application.Common.Interfaces;
 using Academic360.Infrastructure;
+using Academic360.Infrastructure.Errors;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using Serilog;
-// Agregado para protección contra fuerza bruta
+using System;
+using System.Text;
 using System.Threading.RateLimiting;
-using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Configurar Serilog
+// Configurar Serilog
 builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
 
-// 2. Registrar dependencias de Capas (Clean Architecture)
+// Registrar dependencias de Capas (Clean Architecture)
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
-// 3. Registrar servicios propios de la API
+// Registrar servicios propios de la API
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUsuarioActual, UsuarioActual>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
-// --- CORRECCIÓN OWASP A04: Rate Limiting ---
-// Previene ataques de denegación de servicio (DoS) y fuerza bruta en el Login.
+//builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Autorización JWT.\r\n\r\nEscribe tu token directamente abajo (NO necesitas escribir 'Bearer ' antes)."
+    });
+
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+
+
+
+// --- NUEVO: Registro del Manejador Global de Excepciones ---
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+// --- OWASP A04: Rate Limiting ---
 builder.Services.AddRateLimiter(options =>
 {
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
         RateLimitPartition.GetFixedWindowLimiter(
-            // Agrupa por IP del cliente
             partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? httpContext.Request.Headers.Host.ToString(),
             factory: partition => new FixedWindowRateLimiterOptions
             {
@@ -45,11 +85,11 @@ builder.Services.AddRateLimiter(options =>
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 });
 
-// 4. Configurar Autenticación JWT
+// Configurar Autenticación JWT
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKeyValue = jwtSettings["Secret"];
 
-// --- CORRECCIÓN OWASP A05: Fail-Fast sin Secretos Hardcodeados ---
+// OWASP A05: Fail-Fast sin Secretos Hardcodeados ---
 if (string.IsNullOrWhiteSpace(secretKeyValue))
 {
     throw new InvalidOperationException("Seguridad Comprometida: Falta la configuración crítica Jwt:Secret en appsettings o variables de entorno.");
@@ -64,7 +104,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    // --- CORRECCIÓN OWASP A02: Exigir HTTPS ---
+    // OWASP A02: Exigir HTTPS ---
     options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
@@ -80,22 +120,21 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// 5. Configurar CORS (Para permitir solicitudes desde Angular)
+// Configurar CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp", policy =>
     {
-        // Se recomienda leer el origen de appsettings para que en Producción no quede expuesto localhost
         var frontendUrl = builder.Configuration["FrontendUrl"] ?? "http://localhost:4200";
 
         policy.WithOrigins(frontendUrl)
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); // Habilitado por si migras a Cookies HttpOnly para mayor seguridad del JWT
+              .AllowCredentials();
     });
 });
 
-// --- CORRECCIÓN OWASP A02: Configurar HSTS para Producción ---
+// --- OWASP A02: Configurar HSTS para Producción ---
 if (!builder.Environment.IsDevelopment())
 {
     builder.Services.AddHsts(options =>
@@ -108,7 +147,9 @@ if (!builder.Environment.IsDevelopment())
 
 var app = builder.Build();
 
-// 6. Configurar Middleware Pipeline
+// --- Activar Middleware de Manejo de Excepciones ---
+app.UseExceptionHandler();
+
 app.UseSerilogRequestLogging();
 
 if (app.Environment.IsDevelopment())
@@ -118,25 +159,22 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    // Forzar el uso de políticas de seguridad estricta de transporte en producción
     app.UseHsts();
 }
 
-// --- CORRECCIÓN OWASP A05: Cabeceras de Seguridad Básicas ---
+// --- OWASP A05: Cabeceras de Seguridad Básicas ---
 app.Use(async (context, next) =>
 {
-    context.Response.Headers.Append("X-Frame-Options", "DENY"); // Evita que tu API sea embebida en Iframes (Clickjacking)
-    context.Response.Headers.Append("X-Content-Type-Options", "nosniff"); // Evita inyecciones de MIME
-    context.Response.Headers.Append("Content-Security-Policy", "default-src 'self';"); // Mitigación XSS para respuestas API
+    context.Response.Headers.Append("X-Frame-Options", "DENY");
+    context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Append("Content-Security-Policy", "default-src 'self';");
     await next();
 });
 
-// --- CORRECCIÓN OWASP A02: Habilitar redirección HTTPS ---
 app.UseHttpsRedirection();
 
 // Aplicar límites de peticiones antes de autenticar
 app.UseRateLimiter();
-
 app.UseCors("AllowAngularApp");
 
 app.UseAuthentication();

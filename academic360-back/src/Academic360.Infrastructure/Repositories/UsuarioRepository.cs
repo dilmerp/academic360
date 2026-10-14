@@ -3,7 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Academic360.Application.Auth.Commands.Login;
 using Academic360.Application.Auth.Interfaces;
+using Academic360.Application.Common.Exceptions;
 using Dapper;
+using Npgsql; // Para capturar excepciones específicas
 
 namespace Academic360.Infrastructure.Repositories
 {
@@ -18,19 +20,25 @@ namespace Academic360.Infrastructure.Repositories
 
         public async Task<UsuarioAuthResultDto?> ObtenerUsuarioPorLoginAsync(string login, CancellationToken cancellationToken = default)
         {
-            var parameters = new DynamicParameters();
-            parameters.Add("@Login", login, DbType.String, size: 20);
+            try
+            {
+                var parameters = new DynamicParameters();
+                parameters.Add("@Login", login, DbType.String, size: 20);
 
-            // CORRECCIÓN PARA POSTGRESQL: 
-            // Las funciones que retornan tablas se consultan con un SELECT estándar.
-            var commandDefinition = new CommandDefinition(
-                commandText: "SELECT * FROM public.up_sel_usuario_validar_xlogin(@Login)",
-                parameters: parameters,
-                commandType: CommandType.Text, // <-- Cambiado de StoredProcedure a Text
-                cancellationToken: cancellationToken
-            );
+                var commandDefinition = new CommandDefinition(
+                    commandText: "SELECT * FROM public.up_sel_usuario_validar_xlogin(@Login)",
+                    parameters: parameters,
+                    commandType: CommandType.Text,
+                    cancellationToken: cancellationToken
+                );
 
-            return await _connection.QueryFirstOrDefaultAsync<UsuarioAuthResultDto>(commandDefinition);
+                return await _connection.QueryFirstOrDefaultAsync<UsuarioAuthResultDto>(commandDefinition);
+            }
+            catch (NpgsqlException ex)
+            {
+                // Aislamiento: Se enmascara la excepción nativa.
+                throw new DatabaseOperationException("Ocurrió un error a nivel de base de datos al validar el usuario.", ex);
+            }
         }
     }
 }

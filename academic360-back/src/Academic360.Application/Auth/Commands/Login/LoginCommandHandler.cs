@@ -9,7 +9,6 @@ using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-
 namespace Academic360.Application.Auth.Commands.Login
 {
     public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponseDto>
@@ -25,18 +24,13 @@ namespace Academic360.Application.Auth.Commands.Login
 
         public async Task<LoginResponseDto> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
-            // 1. Obtenemos el usuario SOLO por su Login (El SP ya no valida la clave)
-            // Nota: Debes actualizar IUsuarioRepository para que el método solo reciba (request.Usuario)
             var usuarioDto = await _usuarioRepository.ObtenerUsuarioPorLoginAsync(request.Usuario, cancellationToken);
 
-            // CORRECCIÓN OWASP A07: Mensaje opaco unificado si el usuario no existe
             if (usuarioDto == null)
             {
                 throw new UnauthorizedAccessException("Credenciales incorrectas.");
             }
 
-            // 2. CORRECCIÓN OWASP A02: Validación Criptográfica en Memoria con BCrypt
-            // Comparamos el texto plano (request.Contrasena) contra el Hash de BD (usuarioDto.ClaveHash)
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Contrasena, usuarioDto.ClaveHash);
 
             if (!isPasswordValid)
@@ -44,29 +38,23 @@ namespace Academic360.Application.Auth.Commands.Login
                 throw new UnauthorizedAccessException("Credenciales incorrectas.");
             }
 
-            // Defensa en profundidad: Aunque el SP ya filtra por activos (AND U.activo = 1), 
-            // es una buena práctica validarlo también en el core del dominio.
             if (!usuarioDto.Activo)
             {
                 throw new UnauthorizedAccessException("El usuario se encuentra inactivo, comuníquese con el administrador.");
             }
 
-            // 3. CORRECCIÓN OWASP A05: Evitar secretos expuestos como mecanismo de "Fallback"
             var jwtSettings = _configuration.GetSection("Jwt");
             var secretKeyValue = jwtSettings["Secret"];
 
             if (string.IsNullOrWhiteSpace(secretKeyValue))
             {
-                // Fail-Fast: Si el secreto no se inyecta correctamente (ej. desde User Secrets o Key Vault),
-                // el sistema se detiene, evitando generar tokens vulnerables.
                 throw new InvalidOperationException("Seguridad Comprometida: Falta la configuración crítica Jwt:Secret.");
             }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKeyValue));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            // 4. Claims del JWT
-            // Se incluyen solo datos identificativos no sensibles. ¡Nunca agregar ClaveHash o similares aquí!
+            // 4. Claims del JWT: Base para Políticas RBAC y prevención BOLA
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, usuarioDto.IdUsuario.ToString()),
@@ -74,7 +62,9 @@ namespace Academic360.Application.Auth.Commands.Login
                 new Claim(ClaimTypes.Name, usuarioDto.Login),
                 new Claim("Nombre", usuarioDto.Nombre),
                 new Claim("IdArea", usuarioDto.IdArea.ToString()),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) // Mitiga ataques de Replay si decides implementar listas negras
+                // Ejemplo para habilitar [Authorize(Roles = "Admin")] si el DTO tuviera un Rol:
+                // new Claim(ClaimTypes.Role, usuarioDto.Rol ?? "UsuarioEstandar"),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
             var token = new JwtSecurityToken(

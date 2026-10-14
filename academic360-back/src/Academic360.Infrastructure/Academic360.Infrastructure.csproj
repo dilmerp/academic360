@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Academic360.Application\Academic360.Application.csproj" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>

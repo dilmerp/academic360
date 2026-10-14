@@ -16,7 +16,6 @@ public class UsuarioActual : IUsuarioActual
 
     public long ObtenerIdUsuario()
     {
-        // Extrae el Claim (NameIdentifier) que inyectamos al generar el JWT en el Login
         var idClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         if (long.TryParse(idClaim, out long idUsuario))
@@ -24,7 +23,26 @@ public class UsuarioActual : IUsuarioActual
             return idUsuario;
         }
 
-        // Si alguien logra evadir el controlador pero su token no tiene el ID, la capa de aplicación lo rechaza
         throw new UnauthorizedAccessException("Usuario no autenticado o token inválido.");
+    }
+
+    // NUEVO: Permite extraer el IdArea inyectado en el Login para limitar queries
+    public int ObtenerIdArea()
+    {
+        var areaClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("IdArea")?.Value;
+
+        if (int.TryParse(areaClaim, out int idArea))
+        {
+            return idArea;
+        }
+
+        throw new UnauthorizedAccessException("El contexto del usuario carece de un Área válida.");
+    }
+
+    // NUEVO: Permite evaluar roles programáticamente desde los comandos (RBAC avanzado)
+    public bool PerteneceARol(string rolEsperado)
+    {
+        var tieneRol = _httpContextAccessor.HttpContext?.User?.IsInRole(rolEsperado);
+        return tieneRol ?? false;
     }
 }

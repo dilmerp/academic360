@@ -96,6 +96,8 @@ namespace Academic360.Api.Controllers
         [ProducesResponseType(typeof(PagedResult<AlumnoListadoDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Listar([FromQuery] string? filtroGlobal = "", [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
+            throw new Exception("Simulando una caída catastrófica del sistema");
+
             var query = new ObtenerAlumnosPorCriterioQuery
             {
                 FiltroGlobal = filtroGlobal ?? string.Empty,
