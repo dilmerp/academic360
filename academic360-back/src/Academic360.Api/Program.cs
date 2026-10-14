@@ -173,6 +173,12 @@ app.Use(async (context, next) =>
 
 //app.UseHttpsRedirection();
 
+if (app.Environment.IsDevelopment())
+{
+    // Solo redirige a HTTPS cuando ejecutas en tu entorno local (Visual Studio)
+    app.UseHttpsRedirection();
+}
+
 // Aplicar límites de peticiones antes de autenticar
 app.UseRateLimiter();
 app.UseCors("AllowAngularApp");
