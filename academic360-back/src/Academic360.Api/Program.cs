@@ -171,7 +171,7 @@ app.Use(async (context, next) =>
     await next();
 });
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 // Aplicar límites de peticiones antes de autenticar
 app.UseRateLimiter();
