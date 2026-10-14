@@ -2,9 +2,10 @@
 using Academic360.Application.Alumnos.Interfaces;
 using Academic360.Application.Alumnos.Queries.ObtenerAlumnos;
 using Academic360.Application.Common.Exceptions;
+using Academic360.Application.Common.Interfaces;
 using Academic360.Domain.Actores;
 using Dapper;
-using Npgsql; // Para capturar excepciones específicas
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -15,11 +16,11 @@ namespace Academic360.Infrastructure.Repositories
 {
     public class AlumnoRepository : IAlumnoRepository
     {
-        private readonly IDbConnection _connection;
+        private readonly IDbConnectionFactory _connectionFactory;
 
-        public AlumnoRepository(IDbConnection connection)
+        public AlumnoRepository(IDbConnectionFactory connectionFactory)
         {
-            _connection = connection;
+            _connectionFactory = connectionFactory;
         }
 
         public async Task<long> InsertarAsync(Actor alumno, IDbTransaction transaction, CancellationToken cancellationToken = default)
@@ -101,13 +102,15 @@ namespace Academic360.Infrastructure.Repositories
         {
             try
             {
+                using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
+
                 var command = new CommandDefinition(
                     commandText: "SELECT * FROM public.up_sel_actor_xid(@IdActor)",
                     parameters: new { IdActor = idActor },
                     commandType: CommandType.Text,
                     cancellationToken: cancellationToken
                 );
-                return await _connection.QueryFirstOrDefaultAsync<AlumnoResponseDto>(command);
+                return await connection.QueryFirstOrDefaultAsync<AlumnoResponseDto>(command);
             }
             catch (NpgsqlException ex)
             {
@@ -119,6 +122,8 @@ namespace Academic360.Infrastructure.Repositories
         {
             try
             {
+                using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
+
                 var parameters = new DynamicParameters();
                 parameters.Add("@codigo", string.IsNullOrWhiteSpace(codigo) ? "" : codigo, DbType.String, size: 20);
                 parameters.Add("@nombre", string.IsNullOrWhiteSpace(nombre) ? "" : nombre, DbType.String, size: 200);
@@ -129,7 +134,7 @@ namespace Academic360.Infrastructure.Repositories
                     commandType: CommandType.Text,
                     cancellationToken: cancellationToken
                 );
-                return await _connection.QueryAsync<AlumnoListadoDto>(command);
+                return await connection.QueryAsync<AlumnoListadoDto>(command);
             }
             catch (NpgsqlException ex)
             {
@@ -141,6 +146,8 @@ namespace Academic360.Infrastructure.Repositories
         {
             try
             {
+                using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
+
                 var parameters = new DynamicParameters();
                 parameters.Add("@idactor", idActor, DbType.Int32);
                 parameters.Add("@retval", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -151,7 +158,7 @@ namespace Academic360.Infrastructure.Repositories
                     commandType: CommandType.Text,
                     cancellationToken: cancellationToken
                 );
-                await _connection.ExecuteAsync(command);
+                await connection.ExecuteAsync(command);
 
                 return parameters.Get<int>("@retval");
             }

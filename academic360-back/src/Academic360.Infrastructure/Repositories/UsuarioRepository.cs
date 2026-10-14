@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Academic360.Application.Auth.Commands.Login;
 using Academic360.Application.Auth.Interfaces;
 using Academic360.Application.Common.Exceptions;
+using Academic360.Application.Common.Interfaces;
 using Dapper;
 using Npgsql; // Para capturar excepciones específicas
 
@@ -11,17 +12,19 @@ namespace Academic360.Infrastructure.Repositories
 {
     public class UsuarioRepository : IUsuarioRepository
     {
-        private readonly IDbConnection _connection;
+        private readonly IDbConnectionFactory _connectionFactory;
 
-        public UsuarioRepository(IDbConnection connection)
+        public UsuarioRepository(IDbConnectionFactory connectionFactory)
         {
-            _connection = connection;
+            _connectionFactory = connectionFactory;
         }
 
         public async Task<UsuarioAuthResultDto?> ObtenerUsuarioPorLoginAsync(string login, CancellationToken cancellationToken = default)
         {
             try
             {
+                using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
+
                 var parameters = new DynamicParameters();
                 parameters.Add("@Login", login, DbType.String, size: 20);
 
@@ -32,7 +35,7 @@ namespace Academic360.Infrastructure.Repositories
                     cancellationToken: cancellationToken
                 );
 
-                return await _connection.QueryFirstOrDefaultAsync<UsuarioAuthResultDto>(commandDefinition);
+                return await connection.QueryFirstOrDefaultAsync<UsuarioAuthResultDto>(commandDefinition);
             }
             catch (NpgsqlException ex)
             {
