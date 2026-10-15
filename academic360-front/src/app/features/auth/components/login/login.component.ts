@@ -35,7 +35,7 @@ export class LoginComponent {
     this.authService.login(this.loginForm.value).subscribe({
       next: () => {
         this.isSubmitting.set(false);
-        this.router.navigate(['/alumnos/nuevo']);
+        this.router.navigate(['/dashboard']);
       },
       error: (error) => {
         this.isSubmitting.set(false);

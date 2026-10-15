@@ -4,6 +4,7 @@ import { AlumnoFormComponent } from './features/alumnos/components/alumno-form/a
 import { LoginComponent } from './features/auth/components/login/login.component';
 import { AlumnosListComponent } from './features/alumnos/alumnos-list/alumnos-list.component';
 import { MatriculaListComponent } from './features/matriculas/matricula-list/matricula-list.component';
+import { DashboardComponent } from './features/dashboard/dashboard.component';
 
 export const routes: Routes = [
   {
@@ -19,12 +20,13 @@ export const routes: Routes = [
     path: '',
     component: MainLayoutComponent,
     children: [
-      { path: 'dashboard', redirectTo: 'alumnos', pathMatch: 'full' },
+      { path: 'dashboard', component: DashboardComponent },
       { path: 'alumnos', component: AlumnosListComponent },
       { path: 'alumnos/nuevo', component: AlumnoFormComponent },
+      { path: 'matriculas-carrera', component: MatriculaListComponent },
 
-      // AQUI: Cambiamos 'matriculas' por 'matriculas-carrera'
-      { path: 'matriculas-carrera', component: MatriculaListComponent }
+      // Si la ruta entra vacía dentro del layout principal, la enviamos al dashboard
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
   {

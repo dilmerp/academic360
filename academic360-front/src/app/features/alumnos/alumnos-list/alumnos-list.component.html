@@ -2,100 +2,98 @@
   <!-- Cabecera Responsiva -->
   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
     <div>
-      <h2 class="text-2xl font-bold text-white">Listado de Alumnos</h2>
-      <p class="text-gray-400 text-sm mt-1">Gestión del directorio de alumnos</p>
+      <h2 class="text-2xl font-bold text-slate-800">Listado de Alumnos</h2>
+      <p class="text-slate-500 text-sm mt-1">Gestión del directorio de alumnos</p>
     </div>
-    <button routerLink="/alumnos/nuevo" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow flex items-center justify-center transition-colors">
+    <button routerLink="/alumnos/nuevo" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-sm flex items-center justify-center transition-all font-medium">
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
       Nuevo Alumno
     </button>
   </div>
 
-  <!-- Buscador Global con borde acento estilo Visual Studio -->
-  <div class="bg-gray-800 p-4 rounded-lg mb-6 flex flex-col sm:flex-row flex-wrap gap-4 items-stretch sm:items-end"
-       style="border: 1px solid #a855f7; box-shadow: 0 0 8px rgba(168, 85, 247, 0.2);">
+  <!-- Buscador Global - Tarjeta Blanca Estilizada -->
+  <div class="bg-white p-5 rounded-xl mb-6 flex flex-col sm:flex-row flex-wrap gap-4 items-stretch sm:items-end border border-slate-200 shadow-sm">
     <div class="flex-1 w-full">
-      <label class="block text-sm font-medium text-gray-300 mb-1">Criterio de búsqueda</label>
+      <label class="block text-sm font-semibold text-slate-700 mb-1.5">Criterio de búsqueda</label>
       <input type="text" [(ngModel)]="filtroGlobal" (keyup.enter)="buscar()"
-             class="w-full bg-gray-700 rounded-md text-white px-3 py-2 focus:outline-none"
-             style="border: 1px solid #a855f7;"
+             class="w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
              placeholder="Ingrese un texto para buscar...">
     </div>
-    <div class="flex gap-2 w-full sm:w-auto">
-      <button (click)="buscar()" class="flex-1 sm:flex-none bg-gray-600 hover:bg-gray-500 text-white px-6 py-2 rounded-md shadow transition-colors">
+    <div class="flex gap-3 w-full sm:w-auto">
+      <button (click)="buscar()" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg shadow-sm transition-colors font-medium">
         Buscar
       </button>
-      <button (click)="cargarTodos()" class="flex-1 sm:flex-none bg-gray-600 hover:bg-gray-500 text-white px-6 py-2 rounded-md shadow transition-colors">
+      <button (click)="cargarTodos()" class="flex-1 sm:flex-none bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-6 py-2.5 rounded-lg shadow-sm transition-colors font-medium">
         Todos
       </button>
     </div>
   </div>
 
   <!-- Alerta de Errores -->
-  <div *ngIf="mensajeError" class="mb-4 bg-red-900 border border-red-500 text-red-200 px-4 py-3 rounded relative" role="alert">
-    <span class="block sm:inline">{{ mensajeError }}</span>
+  <div *ngIf="mensajeError" class="mb-6 bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl relative shadow-sm" role="alert">
+    <span class="block sm:inline font-medium">{{ mensajeError }}</span>
     <button (click)="mensajeError = ''" class="absolute top-0 bottom-0 right-0 px-4 py-3">
-      <svg class="fill-current h-6 w-6 text-red-400" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Cerrar</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+      <svg class="fill-current h-5 w-5 text-rose-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
     </button>
   </div>
 
-  <!-- Grilla de Datos con borde acento exterior y divisiones -->
-  <div class="bg-gray-800 rounded-lg"
-       style="border: 1px solid #a855f7; box-shadow: 0 0 8px rgba(168, 85, 247, 0.2);">
+  <!-- Grilla de Datos - Tarjeta Blanca Limpia -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
 
-    <!-- El overflow-x-auto requiere que la tabla tenga un ancho mínimo para funcionar -->
-    <div class="overflow-x-auto rounded-t-lg w-full">
-      <!-- Se agregó min-w-[1000px] para evitar que las columnas colapsen en móvil -->
+    <div class="overflow-x-auto w-full">
       <table class="w-full min-w-[1000px] table-fixed">
-        <thead class="bg-gray-750 text-gray-200" style="border-bottom: 1px solid #a855f7;">
+        <thead class="bg-slate-50 border-b border-slate-200 text-slate-600">
           <tr>
-            <th class="w-[12%] px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Código</th>
-            <th class="w-[33%] px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Alumno</th>
-            <th class="w-[15%] px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Teléfono</th>
-            <th class="w-[25%] px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Email</th>
-            <th class="w-[8%] px-6 py-3 text-center text-xs font-bold uppercase tracking-wider">Estado</th>
-            <th class="w-[7%] px-6 py-3 text-center text-xs font-bold uppercase tracking-wider">Acciones</th>
+            <th class="w-[12%] px-6 py-3.5 text-left text-xs font-bold uppercase tracking-wider">Código</th>
+            <th class="w-[33%] px-6 py-3.5 text-left text-xs font-bold uppercase tracking-wider">Alumno</th>
+            <th class="w-[15%] px-6 py-3.5 text-left text-xs font-bold uppercase tracking-wider">Teléfono</th>
+            <th class="w-[25%] px-6 py-3.5 text-left text-xs font-bold uppercase tracking-wider">Email</th>
+            <th class="w-[8%] px-6 py-3.5 text-center text-xs font-bold uppercase tracking-wider">Estado</th>
+            <th class="w-[7%] px-6 py-3.5 text-center text-xs font-bold uppercase tracking-wider">Acciones</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-700/60 text-gray-300">
-          <tr *ngFor="let alumno of alumnos" [ngClass]="{'bg-red-900 bg-opacity-20 text-red-300': alumno.estado === 'I'}" class="hover:bg-gray-750 transition-colors">
-            <td class="px-6 py-4 text-sm font-medium truncate" [title]="alumno.codigo">{{alumno.codigo}}</td>
-            <td class="px-6 py-4 text-sm truncate" [title]="alumno.nombreCompleto">{{alumno.nombreCompleto}}</td>
-            <td class="px-6 py-4 text-sm truncate" [title]="alumno.telefono">{{alumno.telefono}}</td>
-            <td class="px-6 py-4 text-sm truncate" [title]="alumno.email">{{alumno.email}}</td>
+        <tbody class="divide-y divide-slate-100 text-slate-700 bg-white">
+          <tr *ngFor="let alumno of alumnos" [ngClass]="{'bg-rose-50/50': alumno.estado === 'I'}" class="hover:bg-slate-50 transition-colors">
+            <td class="px-6 py-4 text-sm font-medium text-slate-900 truncate" [title]="alumno.codigo">{{alumno.codigo}}</td>
+            <td class="px-6 py-4 text-sm font-medium text-slate-700 truncate" [title]="alumno.nombreCompleto">{{alumno.nombreCompleto}}</td>
+            <td class="px-6 py-4 text-sm text-slate-500 truncate" [title]="alumno.telefono">{{alumno.telefono}}</td>
+            <td class="px-6 py-4 text-sm text-slate-500 truncate" [title]="alumno.email">{{alumno.email}}</td>
             <td class="px-6 py-4 text-sm text-center">
-              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                    [ngClass]="{'bg-green-900 text-green-300': alumno.estado === 'A', 'bg-red-900 text-red-300': alumno.estado === 'I', 'bg-gray-600 text-gray-300': alumno.estado === 'X'}">
+              <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-bold rounded-full"
+                    [ngClass]="{'bg-emerald-100 text-emerald-800': alumno.estado === 'A', 'bg-rose-100 text-rose-800': alumno.estado === 'I', 'bg-slate-100 text-slate-600': alumno.estado === 'X'}">
                 {{alumno.estadoNombre}}
               </span>
             </td>
             <td class="px-6 py-4 text-sm text-center">
-              <button (click)="eliminar(alumno)" class="text-red-400 hover:text-red-300 transition-colors" title="Eliminar">
+              <button (click)="eliminar(alumno)" class="text-slate-400 hover:text-rose-500 hover:bg-rose-50 p-1.5 rounded-lg transition-all" title="Eliminar">
                 <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
               </button>
             </td>
           </tr>
           <tr *ngIf="alumnos.length === 0">
-            <td colspan="6" class="px-6 py-8 text-center text-gray-500">No se encontraron registros.</td>
+            <td colspan="6" class="px-6 py-12 text-center text-slate-500 flex flex-col items-center justify-center">
+              <svg class="w-12 h-12 text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+              No se encontraron registros.
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Paginador Integrado con flex-col para móviles -->
-    <div class="flex flex-col sm:flex-row justify-between items-center px-6 py-3 bg-gray-700 rounded-b-lg gap-4" style="border-top: 1px solid #a855f7;">
-      <div class="text-sm text-gray-300 text-center sm:text-left">
-        Mostrando <span class="font-medium text-white">{{ totalCount === 0 ? 0 : (pageNumber - 1) * pageSize + 1 }}</span> a
-        <span class="font-medium text-white">{{ mathMin(pageNumber * pageSize, totalCount) }}</span> de
-        <span class="font-medium text-white">{{ totalCount }}</span> resultados
+    <!-- Paginador Integrado -->
+    <div class="flex flex-col sm:flex-row justify-between items-center px-6 py-4 bg-slate-50 border-t border-slate-200 gap-4">
+      <div class="text-sm text-slate-600 text-center sm:text-left">
+        Mostrando <span class="font-semibold text-slate-800">{{ totalCount === 0 ? 0 : (pageNumber - 1) * pageSize + 1 }}</span> a
+        <span class="font-semibold text-slate-800">{{ mathMin(pageNumber * pageSize, totalCount) }}</span> de
+        <span class="font-semibold text-slate-800">{{ totalCount }}</span> resultados
       </div>
       <div class="flex space-x-2 w-full sm:w-auto justify-center">
         <button (click)="cambiarPagina(pageNumber - 1)" [disabled]="pageNumber === 1"
-                class="flex-1 sm:flex-none px-4 py-2 sm:px-3 sm:py-1 bg-gray-600 text-white rounded border border-gray-500 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                class="flex-1 sm:flex-none px-4 py-2 sm:px-3 sm:py-1.5 bg-white text-slate-700 rounded-lg border border-slate-300 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm shadow-sm">
           Anterior
         </button>
         <button (click)="cambiarPagina(pageNumber + 1)" [disabled]="pageNumber === totalPages || totalPages === 0"
-                class="flex-1 sm:flex-none px-4 py-2 sm:px-3 sm:py-1 bg-gray-600 text-white rounded border border-gray-500 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                class="flex-1 sm:flex-none px-4 py-2 sm:px-3 sm:py-1.5 bg-white text-slate-700 rounded-lg border border-slate-300 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm shadow-sm">
           Siguiente
         </button>
       </div>
