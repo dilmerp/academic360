@@ -45,7 +45,10 @@ export class MatriculaListComponent implements OnInit {
   cargarSubTipos(): void {
     this.matriculaService.obtenerSubTipos().subscribe({
       next: (data) => this.subTipos = data,
-      error: (err) => console.error('Error al cargar subtipos', err)
+      error: (err) => {
+        this.mostrarError('Error al cargar los subtipos.');
+        console.error(err);
+      }
     });
   }
 
@@ -56,12 +59,16 @@ export class MatriculaListComponent implements OnInit {
     this.idPromocionSeleccionada = 0;
     this.promocionActual = null;
     this.alumnos = [];
+    this.totalCount = 0;
 
     if (this.subTipoSeleccionado) {
       this.matriculaService.obtenerProductos(this.subTipoSeleccionado.idTipo, this.subTipoSeleccionado.idSubTipo)
         .subscribe({
           next: (data) => this.productos = data,
-          error: (err) => console.error('Error al cargar productos', err)
+          error: (err) => {
+             this.mostrarError('Error al cargar productos');
+             console.error(err);
+          }
         });
     }
   }
@@ -71,12 +78,16 @@ export class MatriculaListComponent implements OnInit {
     this.idPromocionSeleccionada = 0;
     this.promocionActual = null;
     this.alumnos = [];
+    this.totalCount = 0;
 
     if (this.idProductoSeleccionado > 0) {
       this.matriculaService.obtenerPromociones(this.idProductoSeleccionado)
         .subscribe({
           next: (data) => this.promociones = data,
-          error: (err) => console.error('Error al cargar promociones', err)
+          error: (err) => {
+            this.mostrarError('Error al cargar promociones');
+            console.error(err);
+          }
         });
     }
   }
@@ -91,6 +102,7 @@ export class MatriculaListComponent implements OnInit {
       this.cargarMatriculas();
     } else {
       this.alumnos = [];
+      this.totalCount = 0;
     }
   }
 
@@ -109,6 +121,7 @@ export class MatriculaListComponent implements OnInit {
   cargarMatriculas(): void {
     if (this.idPromocionSeleccionada === 0) return;
 
+    this.mensajeError = ''; // Limpiamos errores previos antes de buscar
     this.matriculaService.obtenerPorPromocion(
       this.idPromocionSeleccionada,
       this.estadoFiltro,
@@ -120,10 +133,9 @@ export class MatriculaListComponent implements OnInit {
         this.alumnos = response.items;
         this.totalCount = response.totalCount;
         this.totalPages = Math.ceil(this.totalCount / this.pageSize);
-        this.mensajeError = '';
       },
       error: (err) => {
-        this.mensajeError = 'Ocurrió un error al cargar las matrículas.';
+        this.mostrarError('Ocurrió un error al cargar las matrículas.');
         console.error(err);
       }
     });
@@ -145,12 +157,13 @@ export class MatriculaListComponent implements OnInit {
         .subscribe({
           next: () => {
             alumno.esMatricula = nuevoEstado;
+            // Solo recargar si no estamos en la vista "Todos"
             if (this.estadoFiltro === 0 || this.estadoFiltro === 1) {
               this.cargarMatriculas();
             }
           },
           error: (err) => {
-            this.mensajeError = 'Error al actualizar el estado de la matrícula.';
+            this.mostrarError('Error al actualizar el estado de la matrícula.');
             console.error(err);
           }
         });
@@ -159,5 +172,14 @@ export class MatriculaListComponent implements OnInit {
 
   mathMin(a: number, b: number): number {
     return Math.min(a, b);
+  }
+
+  // --- UTILIDADES ---
+  private mostrarError(mensaje: string): void {
+    this.mensajeError = mensaje;
+    // Ocultar mensaje de error tras 5 segundos
+    setTimeout(() => {
+      this.mensajeError = '';
+    }, 5000);
   }
 }

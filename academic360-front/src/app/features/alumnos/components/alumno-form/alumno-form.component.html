@@ -1,84 +1,91 @@
-<div class="min-h-screen bg-slate-950 p-6 md:p-12 flex justify-center items-start font-sans text-slate-200">
-
-  <div class="w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-xl shadow-2xl overflow-hidden">
-
-    <!-- Encabezado de la Tarjeta -->
-    <div class="px-8 py-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/80">
-      <div>
-        <h2 class="text-2xl font-bold text-white tracking-tight">Registro de Alumno</h2>
-        <p class="text-sm text-slate-400 mt-1">Ingrese los datos para matricular al nuevo estudiante en el ERP.</p>
-      </div>
-      <div class="hidden sm:block">
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
-          Módulo Piloto
-        </span>
-      </div>
+<div class="max-w-4xl mx-auto pb-10">
+  <!-- Encabezado -->
+  <div class="mb-6 flex justify-between items-end">
+    <div>
+      <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Registro de Alumno</h2>
+      <p class="text-sm text-slate-500 mt-1">Ingrese los datos para matricular al nuevo estudiante en el ERP.</p>
     </div>
+  </div>
+
+  <div class="w-full bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
 
     <!-- Alertas Generales -->
-    <div *ngIf="errorMessage()" class="mx-8 mt-6 px-4 py-3 bg-red-900/30 border border-red-500/30 rounded-lg text-red-200 text-sm">
-      <div class="flex items-center">
-        <svg class="w-5 h-5 mr-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <div *ngIf="errorMessage()" class="mx-6 mt-6 px-4 py-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-sm shadow-sm">
+      <div class="flex items-center font-medium">
+        <svg class="w-5 h-5 mr-2 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         {{ errorMessage() }}
       </div>
       <div *ngIf="requiresHomologoConfirmation()" class="mt-3 ml-7 flex gap-3">
-        <button type="button" (click)="confirmarHomologo()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded shadow-sm transition-colors">Sí, guardar homónimo</button>
-        <button type="button" (click)="cancelarHomologo()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600 text-xs font-semibold rounded shadow-sm transition-colors">Cancelar</button>
+        <button type="button" (click)="confirmarHomologo()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors">
+          Sí, guardar homónimo
+        </button>
+        <button type="button" (click)="cancelarHomologo()" class="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-semibold rounded-lg shadow-sm transition-colors">
+          Cancelar
+        </button>
       </div>
     </div>
 
-    <div *ngIf="successMessage()" class="mx-8 mt-6 px-4 py-3 bg-emerald-900/30 border border-emerald-500/30 rounded-lg text-emerald-200 text-sm flex items-center">
-      <svg class="w-5 h-5 mr-2 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <div *ngIf="successMessage()" class="mx-6 mt-6 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-sm flex items-center font-medium shadow-sm">
+      <svg class="w-5 h-5 mr-2 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
       {{ successMessage() }}
     </div>
 
     <!-- Navegación de Pestañas (Tabs) -->
-    <div class="flex flex-wrap border-b border-slate-800 bg-slate-900/50 px-8 pt-4 gap-2">
-      <button type="button" (click)="setTab(1)" [ngClass]="{'border-blue-500 text-white bg-slate-800': activeTab() === 1, 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-700': activeTab() !== 1}" class="px-4 py-3 border-b-2 text-sm font-medium transition-all rounded-t-lg">
-        1. Datos Personales
-      </button>
-      <button type="button" (click)="setTab(2)" [ngClass]="{'border-blue-500 text-white bg-slate-800': activeTab() === 2, 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-700': activeTab() !== 2}" class="px-4 py-3 border-b-2 text-sm font-medium transition-all rounded-t-lg">
-        2. Contacto
-      </button>
-      <button type="button" (click)="setTab(3)" [ngClass]="{'border-blue-500 text-white bg-slate-800': activeTab() === 3, 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-700': activeTab() !== 3}" class="px-4 py-3 border-b-2 text-sm font-medium transition-all rounded-t-lg">
-        3. Identificación
-      </button>
-      <button type="button" (click)="setTab(4)" [ngClass]="{'border-blue-500 text-white bg-slate-800': activeTab() === 4, 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-700': activeTab() !== 4}" class="px-4 py-3 border-b-2 text-sm font-medium transition-all rounded-t-lg">
-        4. Credenciales
-      </button>
+    <div class="bg-slate-50 border-b border-slate-200 p-2 sm:p-3 mt-2 sm:mt-0">
+      <div class="flex space-x-1 sm:space-x-2 overflow-x-auto">
+        <button type="button" (click)="setTab(1)" [ngClass]="{'bg-white shadow-sm text-indigo-700 font-bold border-slate-200': activeTab() === 1, 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 border-transparent': activeTab() !== 1}" class="flex-1 min-w-[140px] px-4 py-2.5 rounded-lg text-sm transition-all duration-200 border whitespace-nowrap">
+          1. Datos Personales
+        </button>
+        <button type="button" (click)="setTab(2)" [ngClass]="{'bg-white shadow-sm text-indigo-700 font-bold border-slate-200': activeTab() === 2, 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 border-transparent': activeTab() !== 2}" class="flex-1 min-w-[140px] px-4 py-2.5 rounded-lg text-sm transition-all duration-200 border whitespace-nowrap">
+          2. Contacto
+        </button>
+        <button type="button" (click)="setTab(3)" [ngClass]="{'bg-white shadow-sm text-indigo-700 font-bold border-slate-200': activeTab() === 3, 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 border-transparent': activeTab() !== 3}" class="flex-1 min-w-[140px] px-4 py-2.5 rounded-lg text-sm transition-all duration-200 border whitespace-nowrap">
+          3. Identificación
+        </button>
+        <button type="button" (click)="setTab(4)" [ngClass]="{'bg-white shadow-sm text-indigo-700 font-bold border-slate-200': activeTab() === 4, 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 border-transparent': activeTab() !== 4}" class="flex-1 min-w-[140px] px-4 py-2.5 rounded-lg text-sm transition-all duration-200 border whitespace-nowrap">
+          4. Credenciales
+        </button>
+      </div>
     </div>
 
     <!-- Formulario Principal -->
-    <form [formGroup]="alumnoForm" (ngSubmit)="onSubmit()" class="px-8 py-8 bg-slate-800/30">
+    <form [formGroup]="alumnoForm" (ngSubmit)="onSubmit()" class="px-6 sm:px-8 py-8">
 
       <!-- PESTAÑA 1: DATOS PERSONALES -->
-      <div *ngIf="activeTab() === 1" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div *ngIf="activeTab() === 1" class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
         <div>
-          <label class="block mb-2 text-sm font-medium text-slate-300">Nombres <span class="text-blue-500">*</span></label>
-          <input type="text" formControlName="nombres" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none transition-colors shadow-inner" placeholder="Ej. Juan Carlos">
+          <label class="block mb-1.5 text-sm font-semibold text-slate-700">Tratamiento (Tenor) <span class="text-rose-500">*</span></label>
+          <select formControlName="idTenor" class="w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors appearance-none">
+            <option [ngValue]="0">-- Seleccione --</option>
+            <option *ngFor="let tenor of tenoresList" [ngValue]="tenor.idTenor">{{ tenor.tenorNombre }} ({{ tenor.tenorCodigo }})</option>
+          </select>
         </div>
         <div>
-          <label class="block mb-2 text-sm font-medium text-slate-300">Apellido Paterno <span class="text-blue-500">*</span></label>
-          <input type="text" formControlName="paterno" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none transition-colors shadow-inner">
+          <label class="block mb-1.5 text-sm font-semibold text-slate-700">Nombres <span class="text-rose-500">*</span></label>
+          <input type="text" formControlName="nombres" class="w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" placeholder="Ej. Juan Carlos">
         </div>
         <div>
-          <label class="block mb-2 text-sm font-medium text-slate-300">Apellido Materno</label>
-          <input type="text" formControlName="materno" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none transition-colors shadow-inner">
+          <label class="block mb-1.5 text-sm font-semibold text-slate-700">Apellido Paterno <span class="text-rose-500">*</span></label>
+          <input type="text" formControlName="paterno" class="w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
         </div>
         <div>
-          <label class="block mb-2 text-sm font-medium text-slate-300">Fecha de Nacimiento <span class="text-blue-500">*</span></label>
-          <input type="date" formControlName="fechaNacimiento" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none transition-colors shadow-inner [color-scheme:dark]">
+          <label class="block mb-1.5 text-sm font-semibold text-slate-700">Apellido Materno</label>
+          <input type="text" formControlName="materno" class="w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
         </div>
         <div>
-          <label class="block mb-2 text-sm font-medium text-slate-300">Género <span class="text-blue-500">*</span></label>
-          <select formControlName="sexo" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none transition-colors shadow-inner appearance-none">
+          <label class="block mb-1.5 text-sm font-semibold text-slate-700">Fecha de Nacimiento <span class="text-rose-500">*</span></label>
+          <input type="date" formControlName="fechaNacimiento" class="w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+        </div>
+        <div>
+          <label class="block mb-1.5 text-sm font-semibold text-slate-700">Género <span class="text-rose-500">*</span></label>
+          <select formControlName="sexo" class="w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors appearance-none">
             <option [ngValue]="true">Masculino</option>
             <option [ngValue]="false">Femenino</option>
           </select>
         </div>
         <div>
-          <label class="block mb-2 text-sm font-medium text-slate-300">Estado Civil <span class="text-blue-500">*</span></label>
-          <select formControlName="idCivil" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none transition-colors shadow-inner appearance-none">
+          <label class="block mb-1.5 text-sm font-semibold text-slate-700">Estado Civil <span class="text-rose-500">*</span></label>
+          <select formControlName="idCivil" class="w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors appearance-none">
             <option [ngValue]="0">-- Seleccione --</option>
             <option [ngValue]="1">Soltero(a)</option>
             <option [ngValue]="2">Casado(a)</option>
@@ -88,34 +95,34 @@
       </div>
 
       <!-- PESTAÑA 2: CONTACTO -->
-      <div *ngIf="activeTab() === 2" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div *ngIf="activeTab() === 2" class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
         <div>
-          <label class="block mb-2 text-sm font-medium text-slate-300">Email Principal <span class="text-blue-500">*</span></label>
-          <input type="email" formControlName="email" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none transition-colors shadow-inner" placeholder="correo@ejemplo.com">
+          <label class="block mb-1.5 text-sm font-semibold text-slate-700">Email Principal <span class="text-rose-500">*</span></label>
+          <input type="email" formControlName="email" class="w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" placeholder="correo@ejemplo.com">
         </div>
         <div>
-          <label class="block mb-2 text-sm font-medium text-slate-300">Email Opcional</label>
-          <input type="email" formControlName="emailOpcional" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none transition-colors shadow-inner">
+          <label class="block mb-1.5 text-sm font-semibold text-slate-700">Email Opcional</label>
+          <input type="email" formControlName="emailOpcional" class="w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
         </div>
         <div>
-          <label class="block mb-2 text-sm font-medium text-slate-300">Celular</label>
-          <input type="text" formControlName="celular" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none transition-colors shadow-inner">
+          <label class="block mb-1.5 text-sm font-semibold text-slate-700">Celular</label>
+          <input type="text" formControlName="celular" class="w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
         </div>
         <div>
-          <label class="block mb-2 text-sm font-medium text-slate-300">Teléfono Fijo</label>
-          <input type="text" formControlName="telefono" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none transition-colors shadow-inner">
+          <label class="block mb-1.5 text-sm font-semibold text-slate-700">Teléfono Fijo</label>
+          <input type="text" formControlName="telefono" class="w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
         </div>
         <div class="md:col-span-2">
-          <label class="block mb-2 text-sm font-medium text-slate-300">Dirección de Residencia <span class="text-blue-500">*</span></label>
-          <input type="text" formControlName="direccion" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none transition-colors shadow-inner">
+          <label class="block mb-1.5 text-sm font-semibold text-slate-700">Dirección de Residencia <span class="text-rose-500">*</span></label>
+          <input type="text" formControlName="direccion" class="w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
         </div>
       </div>
 
       <!-- PESTAÑA 3: IDENTIFICACIÓN -->
-      <div *ngIf="activeTab() === 3" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div *ngIf="activeTab() === 3" class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
         <div>
-          <label class="block mb-2 text-sm font-medium text-slate-300">Tipo de Documento <span class="text-blue-500">*</span></label>
-          <select formControlName="idDocumento" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none transition-colors shadow-inner appearance-none">
+          <label class="block mb-1.5 text-sm font-semibold text-slate-700">Tipo de Documento <span class="text-rose-500">*</span></label>
+          <select formControlName="idDocumento" class="w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors appearance-none">
             <option [ngValue]="0">-- Seleccione --</option>
             <option [ngValue]="1">DNI</option>
             <option [ngValue]="2">Carnet de Extranjería</option>
@@ -123,16 +130,16 @@
           </select>
         </div>
         <div>
-          <label class="block mb-2 text-sm font-medium text-slate-300">Número de Documento <span class="text-blue-500">*</span></label>
-          <input type="text" formControlName="numeroDocumento" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none transition-colors shadow-inner">
+          <label class="block mb-1.5 text-sm font-semibold text-slate-700">Número de Documento <span class="text-rose-500">*</span></label>
+          <input type="text" formControlName="numeroDocumento" class="w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
         </div>
         <div>
-          <label class="block mb-2 text-sm font-medium text-slate-300">RUC</label>
-          <input type="text" formControlName="ruc" placeholder="11 dígitos" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none transition-colors shadow-inner">
+          <label class="block mb-1.5 text-sm font-semibold text-slate-700">RUC</label>
+          <input type="text" formControlName="ruc" placeholder="11 dígitos" class="w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
         </div>
         <div>
-          <label class="block mb-2 text-sm font-medium text-slate-300">Nacionalidad <span class="text-blue-500">*</span></label>
-          <select formControlName="idNacionalidad" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none transition-colors shadow-inner appearance-none">
+          <label class="block mb-1.5 text-sm font-semibold text-slate-700">Nacionalidad <span class="text-rose-500">*</span></label>
+          <select formControlName="idNacionalidad" class="w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors appearance-none">
             <option [ngValue]="166">Peruana</option>
             <option [ngValue]="1">Extranjera</option>
           </select>
@@ -140,41 +147,38 @@
       </div>
 
       <!-- PESTAÑA 4: CREDENCIALES -->
-      <div *ngIf="activeTab() === 4" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div *ngIf="activeTab() === 4" class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
         <div class="md:col-span-2">
-          <p class="text-sm text-slate-400 mb-4">Estas credenciales permitirán al alumno ingresar al portal académico.</p>
+          <p class="text-sm text-slate-500 mb-2">Estas credenciales permitirán al alumno ingresar al portal académico.</p>
         </div>
         <div>
-          <label class="block mb-2 text-sm font-medium text-slate-300">Nombre de Usuario <span class="text-blue-500">*</span></label>
-          <input type="text" formControlName="usuario" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none transition-colors shadow-inner">
+          <label class="block mb-1.5 text-sm font-semibold text-slate-700">Nombre de Usuario <span class="text-rose-500">*</span></label>
+          <input type="text" formControlName="usuario" class="w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
         </div>
         <div>
-          <label class="block mb-2 text-sm font-medium text-slate-300">Contraseña de Acceso <span class="text-blue-500">*</span></label>
-          <input type="password" formControlName="contrasena" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none transition-colors shadow-inner">
-        </div>
-
-        <!-- Ocultamos campos requeridos por VB6 pero no visibles para el usuario en este tab para que form sea válido -->
-        <div class="hidden">
-           <input type="number" formControlName="idTenor" [ngModel]="1">
+          <label class="block mb-1.5 text-sm font-semibold text-slate-700">Contraseña de Acceso <span class="text-rose-500">*</span></label>
+          <input type="password" formControlName="contrasena" class="w-full bg-slate-50 border border-slate-300 rounded-lg text-slate-800 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
         </div>
       </div>
 
       <!-- Footer / Acciones -->
-      <div class="mt-8 pt-6 border-t border-slate-800 flex justify-between items-center">
+      <div class="mt-8 pt-6 border-t border-slate-100 flex justify-between items-center">
         <!-- Navegación Secuencial -->
         <div class="flex space-x-3">
-          <button type="button" *ngIf="activeTab() > 1" (click)="previousTab()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-sm font-medium rounded-lg transition-colors">
+          <button type="button" *ngIf="activeTab() > 1" (click)="setTab(activeTab() - 1)" class="px-6 py-2.5 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-lg font-semibold shadow-sm transition-colors flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             Anterior
           </button>
-          <button type="button" *ngIf="activeTab() < 4" (click)="nextTab()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 text-sm font-medium rounded-lg transition-colors">
+          <button type="button" *ngIf="activeTab() < 4" (click)="setTab(activeTab() + 1)" class="px-8 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold shadow-sm transition-colors flex items-center">
             Siguiente
+            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
           </button>
         </div>
 
         <!-- Botón Final de Guardado -->
         <div *ngIf="activeTab() === 4">
-          <button type="submit" [disabled]="isSubmitting() || requiresHomologoConfirmation()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-lg font-medium shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:shadow-none transition-all">
-            <svg *ngIf="isSubmitting()" class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          <button type="submit" [disabled]="isSubmitting() || requiresHomologoConfirmation()" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-2.5 rounded-lg font-semibold shadow-sm disabled:opacity-60 disabled:cursor-not-allowed transition-all">
+            <svg *ngIf="isSubmitting()" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
             {{ isSubmitting() ? 'Procesando...' : 'Finalizar Registro' }}
           </button>
         </div>

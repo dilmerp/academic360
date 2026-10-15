@@ -36,4 +36,11 @@ public class CatalogosController : ControllerBase
         var result = await _repository.ObtenerPromocionesPorProductoAsync(idProducto);
         return Ok(result);
     }
+
+    [HttpGet("tenor")]
+    public async Task<ActionResult<IEnumerable<TenorDto>>> GetTenor()
+    {
+        var result = await _repository.ObtenerTenorActivosAsync();
+        return Ok(result);
+    }
 }

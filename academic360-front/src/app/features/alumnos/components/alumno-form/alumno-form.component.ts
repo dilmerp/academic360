@@ -1,7 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AlumnoService } from '../../services/alumno.service';
+import { AlumnoService, TenorDto } from '../../services/alumno.service';
 import { CrearAlumnoRequestDto } from '../../models/alumno.model';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -12,7 +12,7 @@ import { HttpErrorResponse } from '@angular/common/http';
   templateUrl: './alumno-form.component.html',
   styleUrls: ['./alumno-form.component.css']
 })
-export class AlumnoFormComponent {
+export class AlumnoFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly alumnoService = inject(AlumnoService);
 
@@ -21,6 +21,9 @@ export class AlumnoFormComponent {
   errorMessage = signal<string>('');
   successMessage = signal<string>('');
   requiresHomologoConfirmation = signal<boolean>(false);
+
+  // Lista real para alimentar el selector de tenores desde la base de datos
+  tenoresList: TenorDto[] = [];
 
   // Signal para manejar las pestañas (1: Personales, 2: Contacto, 3: Identidad, 4: Credenciales)
   activeTab = signal<number>(1);
@@ -31,7 +34,7 @@ export class AlumnoFormComponent {
     paterno: ['', [Validators.required, Validators.maxLength(50)]],
     materno: ['', Validators.maxLength(50)],
     nombres: ['', [Validators.required, Validators.maxLength(50)]],
-    idTenor: [0, [Validators.required, Validators.min(1)]],
+    idTenor: [0, [Validators.required, Validators.min(1)]], // Dinámico, requiere selección obligatoria
     sexo: [true, Validators.required],
     idCivil: [0, [Validators.required, Validators.min(1)]],
     email: ['', [Validators.required, Validators.email]],
@@ -58,6 +61,23 @@ export class AlumnoFormComponent {
     estado: ['A'],
     idPeriodo: [1]
   });
+
+  ngOnInit(): void {
+    this.cargarTenores();
+  }
+
+  // --- CARGA REAL DE TENORES DESDE EL BACKEND ---
+  cargarTenores(): void {
+    this.alumnoService.obtenerTenores().subscribe({
+      next: (data) => {
+        this.tenoresList = data;
+      },
+      error: (err) => {
+        this.errorMessage.set('Error al cargar el catálogo de tenores desde el servidor.');
+        console.error(err);
+      }
+    });
+  }
 
   setTab(tabIndex: number) {
     this.activeTab.set(tabIndex);
@@ -92,7 +112,7 @@ export class AlumnoFormComponent {
     this.alumnoService.crearAlumno(formData, forceHomologo).subscribe({
       next: (response: { id: number }) => {
         this.successMessage.set(`¡Alumno registrado correctamente! ID Actor generado: ${response.id}`);
-        this.alumnoForm.reset({ sexo: true, idPaisNacimiento: 166, idPais: 166, idNacionalidad: 166, estado: 'A', idPeriodo: 1, trabaja: false });
+        this.alumnoForm.reset({ idTenor: 0, sexo: true, idPaisNacimiento: 166, idPais: 166, idNacionalidad: 166, estado: 'A', idPeriodo: 1, trabaja: false });
         this.isSubmitting.set(false);
         this.activeTab.set(1);
       },

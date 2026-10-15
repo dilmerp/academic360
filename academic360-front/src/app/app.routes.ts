@@ -5,6 +5,9 @@ import { LoginComponent } from './features/auth/components/login/login.component
 import { AlumnosListComponent } from './features/alumnos/alumnos-list/alumnos-list.component';
 import { MatriculaListComponent } from './features/matriculas/matricula-list/matricula-list.component';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
+import { MatriculaFormComponent } from './features/matriculas/components/matricula-form/matricula-form.component';
+import { MatriculasLibresListComponent } from './features/matriculas/components/matriculas-libres-list/matriculas-libres-list.component';
+
 
 export const routes: Routes = [
   {
@@ -24,9 +27,10 @@ export const routes: Routes = [
       { path: 'alumnos', component: AlumnosListComponent },
       { path: 'alumnos/nuevo', component: AlumnoFormComponent },
       { path: 'matriculas-carrera', component: MatriculaListComponent },
-
-      // Si la ruta entra vacía dentro del layout principal, la enviamos al dashboard
+      { path: 'matriculas-libres/nuevo', component: MatriculaFormComponent },
+      { path: 'matriculas-libres', component: MatriculasLibresListComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+
     ]
   },
   {

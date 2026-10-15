@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
+// --- INTERFACES DE LISTADO Y RESULTADOS ---
 export interface AlumnoMatriculaListadoDto {
   idRegistro: number;
   idMatricula: number;
@@ -23,10 +24,11 @@ export interface PagedResult<T> {
   totalPages: number;
 }
 
+// --- INTERFACES DE CATÁLOGOS ---
 export interface SubTipoDto {
   idTipo: number;
   idSubTipo: number;
-  subTipoNombre: string; // <-- CORRECCIÓN: Actualizado para coincidir con tu Backend
+  subTipoNombre: string;
 }
 
 export interface ProductoDto {
@@ -41,13 +43,76 @@ export interface PromocionDto {
   dirigido: string;
 }
 
+export interface GrupoDto {
+  id: number;
+  codigo: string;
+}
+
+export interface MedioDto {
+  idMedio: number;
+  medioNombre: string;
+}
+
+export interface PlanDto {
+  idPlan: number;
+  planNombre: string;
+  idMoneda: number;
+  monedaNombre: string;
+}
+
+export interface MonedaDto {
+  id: number;
+  nombre: string;
+}
+
+export interface BecaDto {
+  idBeca: number;
+  beneficioNombre: string;
+  descuento: number;
+  descripcion: string;
+}
+
+// --- INTERFACES DE GUARDADO (CURSOS LIBRES) ---
+export interface CursoMatricula {
+  idModulo: number;
+  idCurso: number;
+  idSeccion: number;
+}
+
+export interface CuotaMatricula {
+  idConcepto: number;
+  idPrecio: number;
+  precioDescripcion: string;
+  cuota: number;
+  totalCuotas: number;
+  precio: number;
+  vencimiento: string;
+}
+
+export interface CrearMatriculaRequest {
+  idAlumno: number;
+  idProducto: number;
+  idPromocion: number;
+  idGrupo: number;
+  idMedio: number;
+  idBeca: number;
+  idPlan: number;
+  idMoneda: number;
+  usuarioCreacion: number;
+  cursos: CursoMatricula[];
+  cuotas: CuotaMatricula[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class MatriculaService {
   private http = inject(HttpClient);
-  private apiMatriculas = `${environment.apiUrl}/matriculas`;
-  private apiCatalogos = `${environment.apiUrl}/catalogos`;
+
+  // Endpoints
+  private apiMatriculas = `${environment.apiUrl}/api/matriculas`;
+  private apiCatalogos = `${environment.apiUrl}/api/catalogos`;
+  private apiCursosLibres = `${environment.apiUrl}/api/matriculas-cursos-libres`;
 
   // --- MÉTODOS DE CATÁLOGOS ---
   obtenerSubTipos(): Observable<SubTipoDto[]> {
@@ -62,7 +127,27 @@ export class MatriculaService {
     return this.http.get<PromocionDto[]>(`${this.apiCatalogos}/promociones/${idProducto}`);
   }
 
-  // --- MÉTODOS DE MATRÍCULAS ---
+  obtenerGrupos(idPromocion: number): Observable<GrupoDto[]> {
+    return this.http.get<GrupoDto[]>(`${this.apiCatalogos}/grupos/${idPromocion}`);
+  }
+
+  obtenerPlanes(idPromocion: number, idGrupo: number): Observable<PlanDto[]> {
+    return this.http.get<PlanDto[]>(`${this.apiCatalogos}/planes?idPromocion=${idPromocion}&idGrupo=${idGrupo}`);
+  }
+
+  obtenerMedios(): Observable<MedioDto[]> {
+    return this.http.get<MedioDto[]>(`${this.apiCatalogos}/medios-comunicacion`);
+  }
+
+  obtenerMonedas(): Observable<MonedaDto[]> {
+    return this.http.get<MonedaDto[]>(`${this.apiCatalogos}/monedas`);
+  }
+
+  obtenerBecas(idPromocion: number): Observable<BecaDto[]> {
+    return this.http.get<BecaDto[]>(`${this.apiCatalogos}/becas/${idPromocion}`);
+  }
+
+  // --- MÉTODOS DE MATRÍCULAS (CARRERA) ---
   obtenerPorPromocion(
     idPromocion: number,
     estado: number,
@@ -85,5 +170,10 @@ export class MatriculaService {
   actualizarEstado(idAlumno: number, idRegistro: number, idMatricula: number, esMatricula: boolean): Observable<any> {
     const command = { idAlumno, idRegistro, idMatricula, esMatricula };
     return this.http.put(`${this.apiMatriculas}/estado`, command);
+  }
+
+  // --- NUEVOS MÉTODOS (CURSOS LIBRES) ---
+  registrarMatriculaCursoLibre(matricula: CrearMatriculaRequest): Observable<{ message: string, idMatricula: number }> {
+    return this.http.post<{ message: string, idMatricula: number }>(this.apiCursosLibres, matricula);
   }
 }

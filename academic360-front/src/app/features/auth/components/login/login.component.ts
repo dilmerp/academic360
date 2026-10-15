@@ -15,7 +15,7 @@ export class LoginComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  isSubmitting = signal<boolean>(false);
+  isLoading = signal<boolean>(false);
   errorMessage = signal<string>('');
 
   loginForm: FormGroup = this.fb.group({
@@ -29,16 +29,16 @@ export class LoginComponent {
       return;
     }
 
-    this.isSubmitting.set(true);
+    this.isLoading.set(true);
     this.errorMessage.set('');
 
     this.authService.login(this.loginForm.value).subscribe({
       next: () => {
-        this.isSubmitting.set(false);
+        this.isLoading.set(false);
         this.router.navigate(['/dashboard']);
       },
       error: (error) => {
-        this.isSubmitting.set(false);
+        this.isLoading.set(false);
         this.errorMessage.set(error.error?.detail || 'Credenciales incorrectas o error de conexión al backend.');
       }
     });

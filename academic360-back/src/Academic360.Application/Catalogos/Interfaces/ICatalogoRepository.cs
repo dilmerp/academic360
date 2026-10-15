@@ -21,9 +21,18 @@ public class PromocionDto
     public string Dirigido { get; set; } = string.Empty;
 }
 
+public class TenorDto
+{
+    public int idtenor { get; set; }
+    public string TenorCodigo { get; set; } = string.Empty;
+    public string TenorNombre { get; set; } = string.Empty;
+   
+}
+
 public interface ICatalogoRepository
 {
     Task<IEnumerable<SubTipoDto>> ObtenerSubTiposActivosAsync();
     Task<IEnumerable<ProductoDto>> ObtenerProductosPorSubTipoAsync(int idTipo, int idSubTipo);
     Task<IEnumerable<PromocionDto>> ObtenerPromocionesPorProductoAsync(int idProducto);
+    Task<IEnumerable<TenorDto>> ObtenerTenorActivosAsync();
 }

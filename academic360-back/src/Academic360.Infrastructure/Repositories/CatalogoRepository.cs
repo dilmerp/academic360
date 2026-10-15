@@ -24,6 +24,16 @@ public class CatalogoRepository : ICatalogoRepository
             commandTimeout : 60);
     }
 
+    public async Task<IEnumerable<TenorDto>> ObtenerTenorActivosAsync()
+    {
+        using var connection = await _connectionFactory.CreateConnectionAsync();
+
+        return await connection.QueryAsync<TenorDto>(
+            "SELECT * FROM public.up_sel_tenor_xactivo()",
+            commandType: CommandType.Text,
+            commandTimeout: 60);
+    }
+
     public async Task<IEnumerable<ProductoDto>> ObtenerProductosPorSubTipoAsync(int idTipo, int idSubTipo)
     {
         using var connection = await _connectionFactory.CreateConnectionAsync();

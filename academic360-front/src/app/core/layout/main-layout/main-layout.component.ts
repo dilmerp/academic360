@@ -19,7 +19,7 @@ import { RouterModule, Router } from '@angular/router';
       <aside class="w-64 bg-slate-900 flex flex-col shadow-xl absolute inset-y-0 left-0 transform transition-transform duration-300 ease-in-out z-30 md:relative md:translate-x-0"
              [ngClass]="{'translate-x-0': isSidebarOpen, '-translate-x-full': !isSidebarOpen}">
         <div class="h-16 flex items-center justify-center border-b border-slate-800">
-          <h1 class="text-xl font-bold text-white tracking-wider">Academic<span class="text-indigo-500">360</span></h1>
+          <h1 class="text-xl font-bold text-white tracking-wider">Academic.<span class="text-indigo-500">360</span></h1>
         </div>
 
         <nav class="flex-1 overflow-y-auto py-4">

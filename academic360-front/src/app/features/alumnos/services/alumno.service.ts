@@ -23,12 +23,21 @@ export interface PagedResult<T> {
   totalPages: number;
 }
 
+// Interfaz para el catálogo de tenores
+export interface TenorDto {
+  idTenor: number;
+  tenorCodigo: string;
+  tenorNombre: string;
+  activo: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AlumnoService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/alumnos`;
+  private readonly catalogosUrl = `${environment.apiUrl}/catalogos`; // Apunta correctamente a /api/catalogos
 
   crearAlumno(alumno: CrearAlumnoRequestDto, forceHomologo: boolean = false): Observable<{ id: number }> {
     let params = new HttpParams();
@@ -62,5 +71,10 @@ export class AlumnoService {
 
   eliminarAlumno(idActor: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${idActor}`);
+  }
+
+  // --- CATÁLOGO DE TENORES (Apunta correctamente a /api/catalogos/tenor) ---
+  obtenerTenores(): Observable<TenorDto[]> {
+    return this.http.get<TenorDto[]>(`${this.catalogosUrl}/tenor`);
   }
 }
