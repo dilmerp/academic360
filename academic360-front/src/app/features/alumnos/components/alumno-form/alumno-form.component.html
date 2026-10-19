@@ -52,12 +52,13 @@
     <form [formGroup]="alumnoForm" (ngSubmit)="onSubmit()" class="px-5 sm:px-6 py-5">
 
       <!-- PESTAÑA 1: DATOS PERSONALES -->
-      <div *ngIf="activeTab() === 1" class="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
+      <div *ngIf="activeTab() === 1" class="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in">
         <div>
           <label class="block mb-1 text-xs font-semibold text-slate-700">Tratamiento (Tenor) <span class="text-rose-500">*</span></label>
           <select formControlName="idTenor" class="w-full bg-slate-50 border border-slate-300 rounded-md text-slate-800 px-3 py-1.5 text-[13px] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors appearance-none">
             <option [ngValue]="0">-- Seleccione --</option>
-            <option *ngFor="let tenor of tenoresList" [ngValue]="tenor.idTenor">{{ tenor.tenorNombre }} ({{ tenor.tenorCodigo }})</option>
+            <!-- CORRECCIÓN CLAVE AQUÍ: tenor.idtenor en lugar de tenor.idTenor -->
+            <option *ngFor="let tenor of tenoresList" [ngValue]="tenor.idtenor || tenor.Idtenor">{{ tenor.tenorNombre || tenor.TenorNombre }}</option>
           </select>
         </div>
         <div>
@@ -92,10 +93,23 @@
             <option [ngValue]="3">Viudo(a)</option>
           </select>
         </div>
+        <div>
+          <label class="block mb-1 text-xs font-semibold text-slate-700">País de Nacimiento <span class="text-rose-500">*</span></label>
+          <select formControlName="idPaisNacimiento" class="w-full bg-slate-50 border border-slate-300 rounded-md text-slate-800 px-3 py-1.5 text-[13px] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors appearance-none">
+            <option [ngValue]="0">-- Seleccione --</option>
+            <option [ngValue]="166">Perú</option>
+          </select>
+        </div>
+        <div class="flex items-center mt-5">
+          <label class="flex items-center cursor-pointer group">
+            <input type="checkbox" formControlName="trabaja" class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 bg-slate-50 cursor-pointer">
+            <span class="ml-2 text-[13px] font-medium text-slate-700 group-hover:text-indigo-600 transition-colors">¿El alumno trabaja actualmente?</span>
+          </label>
+        </div>
       </div>
 
       <!-- PESTAÑA 2: CONTACTO -->
-      <div *ngIf="activeTab() === 2" class="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
+      <div *ngIf="activeTab() === 2" class="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in">
         <div>
           <label class="block mb-1 text-xs font-semibold text-slate-700">Email Principal <span class="text-rose-500">*</span></label>
           <input type="email" formControlName="email" class="w-full bg-slate-50 border border-slate-300 rounded-md text-slate-800 px-3 py-1.5 text-[13px] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" placeholder="correo@ejemplo.com">
@@ -112,9 +126,32 @@
           <label class="block mb-1 text-xs font-semibold text-slate-700">Teléfono Fijo</label>
           <input type="text" formControlName="telefono" class="w-full bg-slate-50 border border-slate-300 rounded-md text-slate-800 px-3 py-1.5 text-[13px] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
         </div>
+        <div>
+          <label class="block mb-1 text-xs font-semibold text-slate-700">Teléfono Referencial</label>
+          <input type="text" formControlName="telefonoReferencial" class="w-full bg-slate-50 border border-slate-300 rounded-md text-slate-800 px-3 py-1.5 text-[13px] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+        </div>
+        <div>
+          <label class="block mb-1 text-xs font-semibold text-slate-700">País de Residencia <span class="text-rose-500">*</span></label>
+          <select formControlName="idPais" class="w-full bg-slate-50 border border-slate-300 rounded-md text-slate-800 px-3 py-1.5 text-[13px] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors appearance-none">
+            <option [ngValue]="0">-- Seleccione --</option>
+            <option [ngValue]="166">Perú</option>
+          </select>
+        </div>
         <div class="md:col-span-2">
           <label class="block mb-1 text-xs font-semibold text-slate-700">Dirección de Residencia <span class="text-rose-500">*</span></label>
           <input type="text" formControlName="direccion" class="w-full bg-slate-50 border border-slate-300 rounded-md text-slate-800 px-3 py-1.5 text-[13px] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+        </div>
+        <div>
+          <label class="block mb-1 text-xs font-semibold text-slate-700">Urbanización / Zona</label>
+          <input type="text" formControlName="urbanizacion" class="w-full bg-slate-50 border border-slate-300 rounded-md text-slate-800 px-3 py-1.5 text-[13px] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+        </div>
+        <div class="md:col-span-2">
+          <label class="block mb-1 text-xs font-semibold text-slate-700">Referencia de Dirección</label>
+          <input type="text" formControlName="direccionReferencia" class="w-full bg-slate-50 border border-slate-300 rounded-md text-slate-800 px-3 py-1.5 text-[13px] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+        </div>
+        <div>
+          <label class="block mb-1 text-xs font-semibold text-slate-700">Código Postal</label>
+          <input type="text" formControlName="codigoPostal" class="w-full bg-slate-50 border border-slate-300 rounded-md text-slate-800 px-3 py-1.5 text-[13px] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
         </div>
       </div>
 

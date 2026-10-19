@@ -22,10 +22,10 @@ export class AlumnoFormComponent implements OnInit {
   successMessage = signal<string>('');
   requiresHomologoConfirmation = signal<boolean>(false);
 
-  // Lista real para alimentar el selector de tenores desde la base de datos
-  tenoresList: TenorDto[] = [];
+  // Lista real para alimentar el selector de tenores
+  tenoresList: any[] = []; // Lo pasamos temporalmente a any[] para evitar errores de tipado si cambió el DTO
 
-  // Signal para manejar las pestañas (1: Personales, 2: Contacto, 3: Identidad, 4: Credenciales)
+  // Signal para manejar las pestañas
   activeTab = signal<number>(1);
 
   alumnoForm: FormGroup = this.fb.group({
@@ -34,13 +34,14 @@ export class AlumnoFormComponent implements OnInit {
     paterno: ['', [Validators.required, Validators.maxLength(50)]],
     materno: ['', Validators.maxLength(50)],
     nombres: ['', [Validators.required, Validators.maxLength(50)]],
-    idTenor: [0, [Validators.required, Validators.min(1)]], // Dinámico, requiere selección obligatoria
+    // Mantenemos la regla: debe ser requerido y mayor a 0
+    idTenor: [0, [Validators.required, Validators.min(1)]],
     sexo: [true, Validators.required],
     idCivil: [0, [Validators.required, Validators.min(1)]],
     email: ['', [Validators.required, Validators.email]],
     emailOpcional: ['', Validators.email],
     fechaNacimiento: ['', Validators.required],
-    idPaisNacimiento: [166, [Validators.required, Validators.min(1)]], // 166 = Perú por defecto
+    idPaisNacimiento: [166, [Validators.required, Validators.min(1)]],
     idUbigeoNacimiento: [''],
     idUbigeoNacimientoOtro: [''],
     telefono: [''],
@@ -66,10 +67,11 @@ export class AlumnoFormComponent implements OnInit {
     this.cargarTenores();
   }
 
-  // --- CARGA REAL DE TENORES DESDE EL BACKEND ---
   cargarTenores(): void {
     this.alumnoService.obtenerTenores().subscribe({
       next: (data) => {
+        // CAZADOR DE PROPIEDADES: Esto imprimirá en tu consola (F12) lo que realmente manda el backend
+        console.log('👀 TENORES RECIBIDOS DEL BACKEND:', data);
         this.tenoresList = data;
       },
       error: (err) => {
@@ -96,9 +98,22 @@ export class AlumnoFormComponent implements OnInit {
   }
 
   onSubmit(forceHomologo: boolean = false) {
+    // Imprimir qué valores tiene el formulario justo al presionar Guardar
+    console.log('Valores actuales del formulario:', this.alumnoForm.value);
+
     if (this.alumnoForm.invalid) {
       this.alumnoForm.markAllAsTouched();
-      this.errorMessage.set('Por favor, revise las pestañas. Complete todos los campos obligatorios correctamente.');
+
+      const camposInvalidos: string[] = [];
+      Object.keys(this.alumnoForm.controls).forEach(key => {
+        const control = this.alumnoForm.get(key);
+        if (control?.invalid) {
+          camposInvalidos.push(key);
+          console.log(`❌ Error de validación en el campo '${key}':`, control.errors, 'Valor actual:', control.value);
+        }
+      });
+
+      this.errorMessage.set(`Por favor, complete o corrija los siguientes campos: ${camposInvalidos.join(', ')}`);
       return;
     }
 
@@ -112,7 +127,7 @@ export class AlumnoFormComponent implements OnInit {
     this.alumnoService.crearAlumno(formData, forceHomologo).subscribe({
       next: (response: { id: number }) => {
         this.successMessage.set(`¡Alumno registrado correctamente! ID Actor generado: ${response.id}`);
-        this.alumnoForm.reset({ idTenor: 0, sexo: true, idPaisNacimiento: 166, idPais: 166, idNacionalidad: 166, estado: 'A', idPeriodo: 1, trabaja: false });
+        this.alumnoForm.reset({ idTenor: 0, sexo: true, idPaisNacimiento: 166, idPais: 166, idNacionalidad: 166, estado: 'A', idPeriodo: 1, trabaja: false, idDocumento: 0, idCivil: 0 });
         this.isSubmitting.set(false);
         this.activeTab.set(1);
       },
@@ -122,11 +137,9 @@ export class AlumnoFormComponent implements OnInit {
           this.errorMessage.set('Atención: El alumno ya está registrado (Homónimo). ¿Desea guardarlo de todas formas?');
           this.requiresHomologoConfirmation.set(true);
         } else if (error.status === 400 && error.error?.errors) {
-          // Captura errores de FluentValidation del backend
           const validationErrors = Object.values(error.error.errors).flat().join(' | ');
           this.errorMessage.set(`Validación fallida: ${validationErrors}`);
         } else {
-          // Muestra el mensaje técnico real (ej. Error 500 de SQL Server o CORS)
           this.errorMessage.set(`Error del Servidor (${error.status}): ${error.error?.detail || error.message}`);
         }
       }
