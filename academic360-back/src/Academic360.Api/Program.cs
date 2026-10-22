@@ -46,6 +46,9 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
 {
+    // Agrega esta línea para resolver el conflicto de nombres (SchemaId) en los DTOs
+    c.CustomSchemaIds(type => type.FullName);
+
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",

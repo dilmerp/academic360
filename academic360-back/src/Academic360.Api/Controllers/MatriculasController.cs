@@ -1,5 +1,6 @@
 ﻿using Academic360.Application.Common.Models;
 using Academic360.Application.Matriculas.Commands.ActualizarEstadoMatricula;
+using Academic360.Application.Matriculas.Commands.RegistrarMatricula;
 using Academic360.Application.Matriculas.DTOs;
 using Academic360.Application.Matriculas.Enums;
 using Academic360.Application.Matriculas.Queries.GetMatriculasByPromocion;
@@ -73,5 +74,19 @@ public class MatriculasController : ControllerBase
         }
 
         return BadRequest("No se pudo actualizar el estado de la matrícula.");
+    }
+
+    [HttpPost("registrar")]
+    public async Task<IActionResult> RegistrarMatricula([FromBody] RegistrarMatriculaCommand command)
+    {
+        try
+        {
+            var result = await _mediator.Send(command);
+            return Ok(new { Exito = true, Mensaje = "Matrícula registrada correctamente", Data = result });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { Exito = false, Mensaje = ex.Message });
+        }
     }
 }

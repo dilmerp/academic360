@@ -1,6 +1,8 @@
 ﻿using Academic360.Application.Catalogos.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Academic360.Api.Controllers;
 
@@ -13,7 +15,7 @@ public class CatalogosController : ControllerBase
 
     public CatalogosController(ICatalogoRepository repository)
     {
-        _repository = repository; 
+        _repository = repository;
     }
 
     [HttpGet("subtipos")]
@@ -41,6 +43,50 @@ public class CatalogosController : ControllerBase
     public async Task<ActionResult<IEnumerable<TenorDto>>> GetTenor()
     {
         var result = await _repository.ObtenerTenorActivosAsync();
+        return Ok(result);
+    }
+
+    [HttpGet("grupos/{idPromocion}")]
+    public async Task<ActionResult<IEnumerable<GrupoDto>>> GetGrupos(int idPromocion)
+    {
+        var result = await _repository.ObtenerGruposPorPromocionAsync(idPromocion);
+        return Ok(result);
+    }
+
+    [HttpGet("medios-comunicacion")]
+    public async Task<ActionResult<IEnumerable<MedioDto>>> GetMediosComunicacion()
+    {
+        var result = await _repository.ObtenerMediosActivosAsync();
+        return Ok(result);
+    }
+
+    [HttpGet("monedas")]
+    public async Task<ActionResult<IEnumerable<MonedaDto>>> GetMonedas()
+    {
+        var result = await _repository.ObtenerMonedasActivasAsync();
+        return Ok(result);
+    }
+
+    [HttpGet("planes")]
+    public async Task<ActionResult<IEnumerable<PlanDto>>> GetPlanes([FromQuery] int idPromocion, [FromQuery] int idGrupo, [FromQuery] int idSeccion = -1)
+    {
+        var result = await _repository.ObtenerPlanesAsync(idPromocion, idGrupo, idSeccion);
+        return Ok(result);
+    }
+
+    [HttpGet("becas/{idPromocion}")]
+    public async Task<ActionResult<IEnumerable<BecaDto>>> GetBecas(int idPromocion)
+    {
+        // En este diseño la beca no requiere idPromocion en la BD, 
+        // pero se mantiene el parámetro en la ruta para no romper el servicio Angular.
+        var result = await _repository.ObtenerBecasActivasAsync();
+        return Ok(result);
+    }
+
+    [HttpGet("cursos-disponibles")]
+    public async Task<ActionResult<IEnumerable<CursoDisponibleDto>>> GetCursosDisponibles([FromQuery] int idSubTipo, [FromQuery] int idProducto, [FromQuery] string texto = "")
+    {
+        var result = await _repository.ObtenerCursosDisponiblesAsync(idSubTipo, idProducto, texto);
         return Ok(result);
     }
 }

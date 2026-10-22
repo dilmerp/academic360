@@ -31,10 +31,20 @@ namespace Academic360.Application.MatriculasCursosLibres.DTOs
     {
         public long IdConcepto { get; set; }
         public long IdPrecio { get; set; }
-        public string PrecioDescripcion { get; set; }
+        public string PrecioDescripcion { get; set; } = string.Empty;
         public int Cuota { get; set; }
         public decimal TotalCuotas { get; set; }
         public decimal Precio { get; set; }
         public DateTime Vencimiento { get; set; }
     }
+
+    //public class MatriculaLibreListDto
+    //{
+    //    public long IdRegistro { get; set; }
+    //    public long IdMatricula { get; set; }
+    //    public string Codigo { get; set; } = string.Empty;
+    //    public string Alumno { get; set; } = string.Empty;
+    //    public string Curso { get; set; } = string.Empty;
+    //    public string Fecha { get; set; } = string.Empty;
+    //}
 }

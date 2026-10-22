@@ -3,6 +3,7 @@ using MediatR;
 using System.Threading.Tasks;
 using Academic360.Application.MatriculasCursosLibres.DTOs;
 using Academic360.Application.MatriculasCursosLibres.Commands.CrearMatricula;
+using Academic360.Application.MatriculasCursosLibres.Queries.ObtenerMatriculasCursosLibres;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Academic360.Api.Controllers
@@ -29,6 +30,16 @@ namespace Academic360.Api.Controllers
             var idMatricula = await _mediator.Send(command);
 
             return Ok(new { message = "Matrícula registrada con éxito", idMatricula });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ListarMatriculas([FromQuery] string filtro = "")
+        {
+            // Utiliza la Query de listado general para alimentar la grilla y la barra de búsqueda de la pantalla principal
+            var query = new ObtenerMatriculasCursosLibresQuery(filtro);
+            var resultado = await _mediator.Send(query);
+
+            return Ok(resultado);
         }
     }
 }

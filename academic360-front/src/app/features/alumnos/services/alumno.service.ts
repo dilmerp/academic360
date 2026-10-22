@@ -14,6 +14,15 @@ export interface AlumnoListadoDto {
   estadoNombre: string;
 }
 
+// Interfaz para la búsqueda de alumnos en el modal de matrícula
+export interface AlumnoBusqueda {
+  idAlumno: number;
+  codigo: string;
+  dni: string;
+  nombresCompletos: string;
+  estado: string;
+}
+
 // Nueva interfaz para soportar la respuesta paginada del backend
 export interface PagedResult<T> {
   items: T[];
@@ -67,6 +76,12 @@ export class AlumnoService {
     }
 
     return this.http.get<PagedResult<AlumnoListadoDto>>(this.baseUrl, { params });
+  }
+
+  // Método para la búsqueda rápida en el Modal de Matrícula
+  buscarAlumnos(filtro: string): Observable<AlumnoBusqueda[]> {
+    const params = new HttpParams().set('filtro', filtro);
+    return this.http.get<AlumnoBusqueda[]>(`${this.baseUrl}/buscar`, { params });
   }
 
   eliminarAlumno(idActor: number): Observable<any> {

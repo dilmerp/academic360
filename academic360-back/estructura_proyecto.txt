@@ -1,0 +1,127 @@
+Analizando: academic360-back
+├── 📂 src
+│   ├── 📂 Academic360.Api
+│   │   ├── 📎 Academic360.Application
+│   │   └── 📎 Academic360.Infrastructure
+│   │   ├── 📂 Controllers
+│   │   │   ├── 📄 AlumnosController.cs
+│   │   │   ├── 📄 AuthController.cs
+│   │   │   ├── 📄 CatalogosController.cs
+│   │   │   ├── 📄 MatriculasController.cs
+│   │   │   ├── 📄 MatriculasCursosLibresController.cs
+│   │   │   └── 📄 MigracionController.cs
+│   │   ├── 📂 Logs
+│   │   ├── 📂 Properties
+│   │   ├── 📂 Services
+│   │   │   └── 📄 UsuarioActual.cs
+│   │   └── 📄 Program.cs
+│   ├── 📂 Academic360.Application
+│   │   └── 📎 Academic360.Domain
+│   │   ├── 📂 Actores
+│   │   │   └── 📂 Interfaces
+│   │   │       └── 📄 IActorFotoRepository.cs
+│   │   ├── 📂 Alumnos
+│   │   │   ├── 📂 Commands
+│   │   │   │   ├── 📂 ActualizarEstadoMatricula
+│   │   │   │   │   ├── 📄 ActualizarEstadoMatriculaCommand.cs
+│   │   │   │   │   └── 📄 ActualizarEstadoMatriculaCommandHandler.cs
+│   │   │   │   ├── 📂 CrearAlumno
+│   │   │   │   │   ├── 📄 CrearAlumnoCommand.cs
+│   │   │   │   │   ├── 📄 CrearAlumnoCommandHandler.cs
+│   │   │   │   │   └── 📄 CrearAlumnoCommandValidator.cs
+│   │   │   │   └── 📂 EliminarAlumno
+│   │   │   │       ├── 📄 EliminarAlumnoCommand.cs
+│   │   │   │       └── 📄 EliminarAlumnoCommandHandler.cs
+│   │   │   ├── 📂 DTOs
+│   │   │   │   ├── 📄 AlumnoBusquedaDto.cs
+│   │   │   │   ├── 📄 AlumnoResponseDto.cs
+│   │   │   │   └── 📄 CrearAlumnoRequestDto.cs
+│   │   │   ├── 📂 Interfaces
+│   │   │   │   ├── 📄 IAlumnoMatriculaRepository.cs
+│   │   │   │   └── 📄 IAlumnoRepository.cs
+│   │   │   └── 📂 Queries
+│   │   │       ├── 📂 BuscarAlumnos
+│   │   │       │   ├── 📄 BuscarAlumnosQuery.cs
+│   │   │       │   └── 📄 BuscarAlumnosQueryHandler.cs
+│   │   │       ├── 📂 ObtenerAlumnoPorId
+│   │   │       │   ├── 📄 ObtenerAlumnoPorIdQuery.cs
+│   │   │       │   └── 📄 ObtenerAlumnoPorIdQueryHandler.cs
+│   │   │       └── 📂 ObtenerAlumnos
+│   │   │           ├── 📄 AlumnoListadoDto.cs
+│   │   │           ├── 📄 ObtenerAlumnosPorCriterioQuery.cs
+│   │   │           └── 📄 ObtenerAlumnosPorCriterioQueryHandler.cs
+│   │   ├── 📂 Auth
+│   │   │   ├── 📂 Commands
+│   │   │   │   └── 📂 Login
+│   │   │   │       ├── 📄 LoginCommand.cs
+│   │   │   │       ├── 📄 LoginCommandHandler.cs
+│   │   │   │       ├── 📄 LoginResponseDto.cs
+│   │   │   │       └── 📄 UsuarioAuthResultDto.cs
+│   │   │   └── 📂 Interfaces
+│   │   │       └── 📄 IUsuarioRepository.cs
+│   │   ├── 📂 Catalogos
+│   │   │   └── 📂 Interfaces
+│   │   │       └── 📄 ICatalogoRepository.cs
+│   │   ├── 📂 Common
+│   │   │   ├── 📂 Behaviors
+│   │   │   │   └── 📄 ValidationBehavior.cs
+│   │   │   ├── 📂 Exceptions
+│   │   │   │   └── 📄 DatabaseOperationException.cs
+│   │   │   ├── 📂 Interfaces
+│   │   │   │   ├── 📄 IDbConnectionFactory.cs
+│   │   │   │   └── 📄 IUsuarioActual.cs
+│   │   │   └── 📂 Models
+│   │   │       └── 📄 PagedResult.cs
+│   │   ├── 📂 Matriculas
+│   │   │   ├── 📂 Commands
+│   │   │   │   ├── 📂 ActualizarEstadoMatricula
+│   │   │   │   │   └── 📄 ActualizarEstadoMatriculaCommand.cs
+│   │   │   │   └── 📂 RegistrarMatricula
+│   │   │   │       ├── 📄 RegistrarMatriculaCommand.cs
+│   │   │   │       └── 📄 RegistrarMatriculaCommandHandler.cs
+│   │   │   ├── 📂 DTOs
+│   │   │   │   └── 📄 AlumnoMatriculaListadoDto.cs
+│   │   │   ├── 📂 Enums
+│   │   │   │   └── 📄 FiltroMatriculaEstado.cs
+│   │   │   └── 📂 Queries
+│   │   │       └── 📂 GetMatriculasByPromocion
+│   │   │           ├── 📄 GetMatriculasByPromocionQuery.cs
+│   │   │           └── 📄 GetMatriculasByPromocionQueryHandler.cs
+│   │   ├── 📂 MatriculasCursosLibres
+│   │   │   ├── 📂 Commands
+│   │   │   │   └── 📂 CrearMatricula
+│   │   │   │       ├── 📄 CrearMatriculaCommand.cs
+│   │   │   │       └── 📄 CrearMatriculaCommandHandler.cs
+│   │   │   ├── 📂 DTOs
+│   │   │   │   └── 📄 CrearMatriculaRequestDto.cs
+│   │   │   └── 📂 Interfaces
+│   │   │       └── 📄 IMatriculaCursoLibreRepository.cs
+│   │   └── 📄 DependencyInjection.cs
+│   ├── 📂 Academic360.Domain
+│   │   ├── 📂 Actores
+│   │   │   └── 📄 Actor.cs
+│   │   ├── 📂 Common
+│   │   │   └── 📄 EntidadAuditable.cs
+│   │   └── 📂 Enums
+│   │       ├── 📄 EstadoActor.cs
+│   │       └── 📄 RolActor.cs
+│   └── 📂 Academic360.Infrastructure
+│       └── 📎 Academic360.Application
+│       ├── 📂 Data
+│       │   └── 📄 DbConnectionFactory.cs
+│       ├── 📂 Errors
+│       │   └── 📄 GlobalExceptionHandler.cs
+│       ├── 📂 Repositories
+│       │   ├── 📄 ActorFotoRepository.cs
+│       │   ├── 📄 AlumnoMatriculaRepository.cs
+│       │   ├── 📄 AlumnoRepository.cs
+│       │   ├── 📄 CatalogoRepository.cs
+│       │   ├── 📄 MatriculaCursoLibreRepository.cs
+│       │   └── 📄 UsuarioRepository.cs
+│       └── 📄 DependencyInjection.cs
+└── 📂 tests
+    └── 📂 Academic360.Tests
+        ├── 📎 Academic360.Application
+        ├── 📎 Academic360.Infrastructure
+        └── 📎 Academic360.Api
+        └── 📄 UnitTest1.cs

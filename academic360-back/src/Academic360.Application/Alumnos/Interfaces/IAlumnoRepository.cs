@@ -14,4 +14,6 @@ public interface IAlumnoRepository
     Task<AlumnoResponseDto?> ObtenerPorIdAsync(long idActor, CancellationToken cancellationToken = default);
     Task<IEnumerable<AlumnoListadoDto>> ListarAlumnosAsync(string codigo, string nombre, CancellationToken cancellationToken = default);
     Task<int> EliminarAlumnoAsync(long idActor, CancellationToken cancellationToken = default);
+    Task<IEnumerable<AlumnoBusquedaDto>> BuscarAlumnosAsync(string filtro, CancellationToken cancellationToken = default);
+
 }

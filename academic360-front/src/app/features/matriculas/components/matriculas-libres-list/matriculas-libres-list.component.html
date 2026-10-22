@@ -43,6 +43,18 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100 text-slate-700 bg-white">
+          <!-- Filas de registros -->
+          <tr *ngFor="let item of matriculas" class="hover:bg-slate-50 transition-colors">
+            <td class="px-4 py-2 text-[13px]">{{ item.codigo }}</td>
+            <td class="px-4 py-2 text-[13px] font-medium text-slate-800">{{ item.alumno }}</td>
+            <td class="px-4 py-2 text-[13px]">{{ item.curso }}</td>
+            <td class="px-4 py-2 text-[13px] text-center">{{ item.fecha }}</td>
+            <td class="px-4 py-2 text-center">
+              <button class="text-indigo-600 hover:text-indigo-800 font-medium text-[13px]">Ver</button>
+            </td>
+          </tr>
+
+          <!-- Mensaje cuando no hay registros -->
           <tr *ngIf="matriculas.length === 0">
             <td colspan="5" class="px-4 py-6 text-center text-slate-500">
               <div class="flex flex-col items-center justify-center">

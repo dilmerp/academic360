@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Academic360.Application.Alumnos.Commands.ActualizarEstadoMatricula;
+﻿using Academic360.Application.Alumnos.Commands.ActualizarEstadoMatricula;
 using Academic360.Application.Alumnos.Commands.CrearAlumno;
 using Academic360.Application.Alumnos.Commands.EliminarAlumno;
 using Academic360.Application.Alumnos.DTOs;
+using Academic360.Application.Alumnos.Queries.BuscarAlumnos;
 using Academic360.Application.Alumnos.Queries.ObtenerAlumnoPorId;
 using Academic360.Application.Alumnos.Queries.ObtenerAlumnos;
 using Academic360.Application.Common.Models;
@@ -14,6 +11,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Academic360.Api.Controllers
 {
@@ -88,6 +89,14 @@ namespace Academic360.Api.Controllers
                 _logger.LogError(ex, "Error interno obteniendo alumno {Id}", id);
                 return StatusCode(StatusCodes.Status500InternalServerError, new { detail = "Ocurrió un error interno." });
             }
+        }
+
+        [HttpGet("buscar")]
+        public async Task<ActionResult<IEnumerable<AlumnoBusquedaDto>>> BuscarAlumnos([FromQuery] string filtro)
+        {
+            var query = new BuscarAlumnosQuery { Filtro = filtro };
+            var alumnos = await _mediator.Send(query);
+            return Ok(alumnos);
         }
 
         [HttpGet]
