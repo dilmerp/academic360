@@ -1,0 +1,119 @@
+<div class="max-w-7xl mx-auto pb-8">
+  <!-- Cabecera Responsiva Compacta -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800">Matrícula de Carrera Profesional</h2>
+      <p class="text-slate-500 text-xs mt-0.5">Gestión del listado de alumnos y estados de matrícula</p>
+    </div>
+  </div>
+
+  <!-- Tarjeta Unificada: Filtros Limpios (Sin Promoción visible ni Pestañas redundantes) -->
+  <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-4">
+    <!-- Fila 1: Subtipo y Programa (Carrera) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Área Académica</label>
+        <select [(ngModel)]="subTipoSeleccionado" (change)="onSubTipoChange()" class="w-full bg-slate-50 border border-slate-300 rounded-md text-slate-800 px-3 py-1.5 text-[13px] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+          <option [ngValue]="null">-- Seleccione Área --</option>
+          <option *ngFor="let st of subTipos" [ngValue]="st">{{st.subTipoNombre}}</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Carrera / Programa</label>
+        <select [(ngModel)]="idProductoSeleccionado" (change)="onProductoChange()" [disabled]="productos.length === 0" class="w-full bg-slate-50 border border-slate-300 rounded-md text-slate-800 px-3 py-1.5 text-[13px] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors disabled:opacity-60 disabled:bg-slate-100 disabled:cursor-not-allowed">
+          <option [value]="0">-- Seleccione Carrera --</option>
+          <option *ngFor="let prod of productos" [value]="prod.id">{{prod.nombre}}</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Fila 2: Buscador Global Integrado -->
+    <div class="flex flex-col lg:flex-row gap-4 pt-4 border-t border-slate-100 items-start lg:items-end">
+      <div class="flex-1 flex gap-2 w-full">
+        <div class="relative flex-1">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          </div>
+          <input type="text" [(ngModel)]="filtroGlobal" (keyup.enter)="buscar()" class="w-full bg-slate-50 border border-slate-300 rounded-md text-slate-800 pl-9 pr-3 py-1.5 text-[13px] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" placeholder="Buscar por alumno, grupo o sección...">
+        </div>
+        <button (click)="buscar()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-1.5 rounded-md shadow-sm transition-colors font-medium text-[13px] whitespace-nowrap">
+          Buscar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alerta de Errores -->
+  <div *ngIf="mensajeError" class="mb-4 bg-rose-50 border border-rose-200 text-rose-700 px-3 py-2 rounded-md shadow-sm flex items-center text-[13px]">
+    <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <span class="block sm:inline font-medium">{{ mensajeError }}</span>
+  </div>
+
+  <!-- Grilla de Datos -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="overflow-x-auto w-full">
+      <table class="w-full min-w-[900px] table-fixed">
+        <thead class="bg-slate-50 border-b border-slate-200 text-slate-500">
+          <tr>
+            <th class="w-[30%] px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider">Alumno</th>
+            <th class="w-[10%] px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider">Grupo</th>
+            <th class="w-[25%] px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider">Curso - Sección</th>
+            <th class="w-[10%] px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider">Fecha</th>
+            <th class="w-[12%] px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider">Usuario</th>
+            <th class="w-[13%] px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-wider">Acción</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-slate-700 bg-white">
+          <tr *ngFor="let alumno of alumnos" class="hover:bg-slate-50 transition-colors">
+            <td class="px-4 py-2 text-[13px] font-medium truncate flex items-center">
+              <svg *ngIf="alumno.esMatricula" class="w-4 h-4 text-emerald-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <svg *ngIf="!alumno.esMatricula" class="w-4 h-4 text-slate-300 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              {{alumno.nombreCompleto}}
+            </td>
+            <td class="px-4 py-2 text-[13px] truncate" [title]="alumno.grupoCodigo">{{alumno.grupoCodigo}}</td>
+            <td class="px-4 py-2 text-[13px] truncate" [title]="alumno.seccion">{{alumno.seccion}}</td>
+            <td class="px-4 py-2 text-[13px]">{{alumno.matriculaFecha | date:'dd/MM/yyyy'}}</td>
+            <td class="px-4 py-2 text-[13px] truncate">{{alumno.matriculadoPor}}</td>
+            <td class="px-4 py-2 text-center">
+              <button (click)="toggleMatricula(alumno)"
+                [ngClass]="alumno.esMatricula ? 'bg-rose-100 text-rose-700 hover:bg-rose-200 border border-rose-200' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border border-emerald-200'"
+                class="px-3 py-1 rounded-md shadow-sm font-semibold text-[11px] transition-colors w-full">
+                {{ alumno.esMatricula ? 'Deshacer' : 'Matricular' }}
+              </button>
+            </td>
+          </tr>
+
+          <!-- Estados vacíos -->
+          <tr *ngIf="alumnos.length === 0">
+            <td colspan="6" class="px-4 py-8 text-center text-slate-500">
+              <div class="flex flex-col items-center justify-center">
+                <svg class="w-8 h-8 text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                <span class="text-[13px]" *ngIf="idProductoSeleccionado === 0">Seleccione un área y carrera para ver los alumnos.</span>
+                <span class="text-[13px]" *ngIf="idProductoSeleccionado > 0">No se encontraron registros para los filtros seleccionados.</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginador Integrado Compacto -->
+    <div class="flex flex-col sm:flex-row justify-between items-center px-4 py-3 bg-slate-50 border-t border-slate-200 gap-3">
+      <div class="text-[13px] text-slate-600 text-center sm:text-left">
+        Mostrando <span class="font-semibold text-slate-800">{{ totalCount === 0 ? 0 : (pageNumber - 1) * pageSize + 1 }}</span> a
+        <span class="font-semibold text-slate-800">{{ mathMin(pageNumber * pageSize, totalCount) }}</span> de
+        <span class="font-semibold text-slate-800">{{ totalCount }}</span> resultados
+      </div>
+      <div class="flex space-x-2">
+        <button (click)="cambiarPagina(pageNumber - 1)" [disabled]="pageNumber === 1"
+                class="px-3 py-1.5 bg-white text-slate-700 border border-slate-300 rounded-md hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-[13px] shadow-sm">
+          Anterior
+        </button>
+        <button (click)="cambiarPagina(pageNumber + 1)" [disabled]="pageNumber === totalPages || totalPages === 0"
+                class="px-3 py-1.5 bg-white text-slate-700 border border-slate-300 rounded-md hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-[13px] shadow-sm">
+          Siguiente
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

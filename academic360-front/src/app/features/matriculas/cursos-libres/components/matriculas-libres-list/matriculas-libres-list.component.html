@@ -1,0 +1,94 @@
+<div class="max-w-7xl mx-auto pb-8">
+  <!-- Cabecera Responsiva Compacta -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800">Matrículas de Cursos Libres</h2>
+      <p class="text-slate-500 text-xs mt-0.5">Gestión del listado de matrículas y alumnos inscritos</p>
+    </div>
+    <button routerLink="/matriculas-libres/nuevo" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-md shadow-sm flex items-center justify-center transition-all text-sm font-medium">
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+      Nueva Matrícula
+    </button>
+  </div>
+
+  <!-- Tarjeta Unificada: Buscador Global -->
+  <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-4 flex flex-col sm:flex-row flex-wrap gap-3 items-stretch sm:items-end">
+    <div class="flex-1 w-full">
+      <label class="block text-xs font-semibold text-slate-700 mb-1">Criterio de búsqueda</label>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+        <input type="text" [(ngModel)]="filtroGlobal" (keyup.enter)="buscar()"
+               class="w-full bg-slate-50 border border-slate-300 rounded-md text-slate-800 pl-9 pr-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-[13px]"
+               placeholder="Buscar por código o nombre del alumno...">
+      </div>
+    </div>
+    <div class="flex gap-2 w-full sm:w-auto">
+      <button (click)="buscar()" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-1.5 rounded-md shadow-sm transition-colors text-[13px] font-medium">
+        Buscar
+      </button>
+      <button (click)="cargarTodos()" class="flex-1 sm:flex-none bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-5 py-1.5 rounded-md shadow-sm transition-colors text-[13px] font-medium">
+        Todos
+      </button>
+    </div>
+  </div>
+
+  <!-- Grilla de Datos -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="overflow-x-auto w-full">
+      <table class="w-full min-w-[900px] table-fixed">
+        <thead class="bg-slate-50 border-b border-slate-200 text-slate-500">
+          <tr>
+            <th class="w-[15%] px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider">Código</th>
+            <th class="w-[40%] px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider">Alumno</th>
+            <th class="w-[25%] px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider">Curso</th>
+            <th class="w-[10%] px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-wider">Fecha</th>
+            <th class="w-[10%] px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-wider">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-slate-700 bg-white">
+          <!-- Filas de registros -->
+          <tr *ngFor="let item of matriculas" class="hover:bg-slate-50 transition-colors">
+            <td class="px-4 py-2 text-[13px] font-medium">{{ item.codigo }}</td>
+            <td class="px-4 py-2 text-[13px] font-medium text-slate-800">{{ item.alumno }}</td>
+            <td class="px-4 py-2 text-[13px]">{{ item.curso }}</td>
+            <td class="px-4 py-2 text-[13px] text-center">{{ item.fecha }}</td>
+            <td class="px-4 py-2 text-center">
+              <button class="text-indigo-600 hover:text-indigo-800 font-semibold text-[12px] uppercase tracking-wide">Ver Detalle</button>
+            </td>
+          </tr>
+
+          <!-- Mensaje cuando no hay registros -->
+          <tr *ngIf="matriculas.length === 0">
+            <td colspan="5" class="px-4 py-8 text-center text-slate-500">
+              <div class="flex flex-col items-center justify-center">
+                <svg class="w-8 h-8 text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                <span class="text-[13px]">No se encontraron registros de matrículas. Haga clic en "Nueva Matrícula" para empezar.</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginador Integrado Compacto -->
+    <div class="flex flex-col sm:flex-row justify-between items-center px-4 py-3 bg-slate-50 border-t border-slate-200 gap-3">
+      <div class="text-[13px] text-slate-600 text-center sm:text-left">
+        Mostrando <span class="font-semibold text-slate-800">{{ totalCount === 0 ? 0 : (pageNumber - 1) * pageSize + 1 }}</span> a
+        <span class="font-semibold text-slate-800">{{ mathMin(pageNumber * pageSize, totalCount) }}</span> de
+        <span class="font-semibold text-slate-800">{{ totalCount }}</span> resultados
+      </div>
+      <div class="flex space-x-2">
+        <button (click)="cambiarPagina(pageNumber - 1)" [disabled]="pageNumber === 1"
+                class="px-3 py-1.5 bg-white text-slate-700 border border-slate-300 rounded-md hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-[13px] shadow-sm">
+          Anterior
+        </button>
+        <button (click)="cambiarPagina(pageNumber + 1)" [disabled]="pageNumber === totalPages || totalPages === 0"
+                class="px-3 py-1.5 bg-white text-slate-700 border border-slate-300 rounded-md hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-[13px] shadow-sm">
+          Siguiente
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

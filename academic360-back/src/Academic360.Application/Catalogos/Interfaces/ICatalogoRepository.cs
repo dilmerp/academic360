@@ -80,6 +80,14 @@ public class CursoDisponibleDto
     public string Codigo { get; set; } = string.Empty;
 }
 
+public class ConceptoPrecioDto
+{
+    public int IdConcepto { get; set; }
+    public int IdPrecio { get; set; }
+    public string PrecioDescripcion { get; set; } = string.Empty;
+    public decimal Precio { get; set; }
+}
+
 public interface ICatalogoRepository
 {
     Task<IEnumerable<SubTipoDto>> ObtenerSubTiposActivosAsync();
@@ -93,4 +101,6 @@ public interface ICatalogoRepository
     Task<IEnumerable<PlanDto>> ObtenerPlanesAsync(int idPromocion, int idGrupo, int idSeccion);
     Task<IEnumerable<BecaDto>> ObtenerBecasActivasAsync();
     Task<IEnumerable<CursoDisponibleDto>> ObtenerCursosDisponiblesAsync(int idSubTipo, int idProducto, string texto);
+    Task<IEnumerable<ConceptoPrecioDto>> ObtenerConceptosPrecioAsync(int idMoneda, int? idPlan);
+
 }

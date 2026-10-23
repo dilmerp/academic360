@@ -89,4 +89,11 @@ public class CatalogosController : ControllerBase
         var result = await _repository.ObtenerCursosDisponiblesAsync(idSubTipo, idProducto, texto);
         return Ok(result);
     }
+
+    [HttpGet("conceptos-precio")]
+    public async Task<ActionResult<IEnumerable<ConceptoPrecioDto>>> GetConceptosPrecio([FromQuery] int idMoneda, [FromQuery] int? idPlan)
+    {
+        var result = await _repository.ObtenerConceptosPrecioAsync(idMoneda, idPlan);
+        return Ok(result);
+    }
 }

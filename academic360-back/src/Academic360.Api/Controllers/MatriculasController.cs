@@ -1,9 +1,11 @@
 ﻿using Academic360.Application.Common.Models;
-using Academic360.Application.Matriculas.Commands.ActualizarEstadoMatricula;
-using Academic360.Application.Matriculas.Commands.RegistrarMatricula;
-using Academic360.Application.Matriculas.DTOs;
-using Academic360.Application.Matriculas.Enums;
-using Academic360.Application.Matriculas.Queries.GetMatriculasByPromocion;
+using Academic360.Application.Matriculas.Carrera.Commands.ActualizarEstadoMatricula;
+using Academic360.Application.Matriculas.Carrera.Commands.RegistrarMatricula;
+using Academic360.Application.Matriculas.Carrera.DTOs;
+using Academic360.Application.Matriculas.Carrera.Enums;
+using Academic360.Application.Matriculas.Carrera.Queries.GetMatriculasByPromocion;
+using Academic360.Application.Matriculas.Carrera.Queries.ObtenerMatriculasPorProducto;
+using Academic360.Application.Matriculas.CursosLibres.Queries.ObtenerMatriculasCursosLibres;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,14 +34,14 @@ public class MatriculasController : ControllerBase
     /// <param name="pageSize">Cantidad de registros por página</param>
     /// <returns>Resultado paginado de alumnos</returns>
     [HttpGet("promocion/{idPromocion}")]
-    public async Task<ActionResult<PagedResult<AlumnoMatriculaListadoDto>>> ObtenerPorPromocion(
+    public async Task<ActionResult<PagedResult<MatriculaCarreraListadoDto>>> ObtenerPorPromocion(
         int idPromocion,
         [FromQuery] FiltroMatriculaEstado estado = FiltroMatriculaEstado.Nuevos,
         [FromQuery] string searchTerm = "",
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10)
     {
-        var query = new GetMatriculasByPromocionQuery
+        var query = new ObtenerMatriculasPorPromocionQueryHandler
         {
             IdPromocion = idPromocion,
             Estado = estado,
@@ -89,4 +91,27 @@ public class MatriculasController : ControllerBase
             return BadRequest(new { Exito = false, Mensaje = ex.Message });
         }
     }
+
+    [HttpGet("producto/{idProducto}")]
+    public async Task<ActionResult<PagedResult<MatriculaCarreraListadoDto>>> ObtenerPorProducto(
+        int idProducto,
+        [FromQuery] FiltroMatriculaEstado estado = FiltroMatriculaEstado.Nuevos,
+        [FromQuery] string searchTerm = "",
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10)
+    {
+        // Se instancia el Request (terminado en QueryHandler según tu convención)
+        var query = new ObtenerMatriculasPorProductoQueryHandler
+        {
+            IdProducto = idProducto,
+            Estado = estado,
+            SearchTerm = searchTerm,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+
+        var result = await _mediator.Send(query);
+        return Ok(result);
+    }
+
 }

@@ -1,13 +1,18 @@
-﻿using Academic360.Application.Matriculas.Commands.RegistrarMatricula;
-using Academic360.Application.Matriculas.DTOs;
-using Academic360.Application.Matriculas.Enums;
+﻿using Academic360.Application.Matriculas.Carrera.Commands.RegistrarMatricula;
+using Academic360.Application.Matriculas.Carrera.DTOs;
+using Academic360.Application.Matriculas.Carrera.Enums;
 
 namespace Academic360.Application.Alumnos.Interfaces;
 
 public interface IAlumnoMatriculaRepository
 {
     // Firma limpia sin valores por defecto para evitar confusiones del compilador
-    Task<IEnumerable<AlumnoMatriculaListadoDto>> ObtenerMatriculasAsync(int idPromocion, FiltroMatriculaEstado estado, string? searchTerm, int? idGrupo, int? idSeccion);
+   // Task<IEnumerable<MatriculaCarreraListadoDto>> ObtenerMatriculasAsync(int idPromocion, FiltroMatriculaEstado estado, string? searchTerm, int? idGrupo, int? idSeccion);
+    // Firma limpia para obtener matrículas por promoción
+    Task<IEnumerable<MatriculaCarreraListadoDto>> ObtenerMatriculasAsync(int idPromocion, FiltroMatriculaEstado estado, string? searchTerm, int? idGrupo, int? idSeccion);
+
+    // Nueva firma para obtener matrículas directamente por producto (carrera)
+    Task<IEnumerable<MatriculaCarreraListadoDto>> ObtenerMatriculasPorProductoAsync(int idProducto, FiltroMatriculaEstado estado, string? searchTerm, int? idGrupo, int? idSeccion);
 
     Task<bool> ActualizarEstadoMatriculaAsync(int idAlumno, int idRegistro, int idMatricula, bool esMatricula);
 

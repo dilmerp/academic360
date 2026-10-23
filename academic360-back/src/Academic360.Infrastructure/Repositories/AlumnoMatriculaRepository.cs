@@ -1,8 +1,8 @@
 ﻿using Academic360.Application.Alumnos.Interfaces;
 using Academic360.Application.Common.Interfaces;
-using Academic360.Application.Matriculas.Commands.RegistrarMatricula;
-using Academic360.Application.Matriculas.DTOs;
-using Academic360.Application.Matriculas.Enums;
+using Academic360.Application.Matriculas.Carrera.Commands.RegistrarMatricula;
+using Academic360.Application.Matriculas.Carrera.DTOs;
+using Academic360.Application.Matriculas.Carrera.Enums;
 using Dapper;
 using System.Collections.Generic;
 using System.Data;
@@ -19,7 +19,7 @@ namespace Academic360.Infrastructure.Repositories
             _connectionFactory = connectionFactory;
         }
 
-        public async Task<IEnumerable<AlumnoMatriculaListadoDto>> ObtenerMatriculasAsync(int idPromocion, FiltroMatriculaEstado estado, string? searchTerm, int? idGrupo, int? idSeccion)
+        public async Task<IEnumerable<MatriculaCarreraListadoDto>> ObtenerMatriculasAsync(int idPromocion, FiltroMatriculaEstado estado, string? searchTerm, int? idGrupo, int? idSeccion)
         {
             using var connection = await _connectionFactory.CreateConnectionAsync();
 
@@ -34,7 +34,7 @@ namespace Academic360.Infrastructure.Repositories
             parameters.Add("@idseccion", idSeccion, DbType.Int32);
             parameters.Add("@nombrecompleto", string.IsNullOrWhiteSpace(searchTerm) ? null : searchTerm, DbType.String);
 
-            var result = await connection.QueryAsync<AlumnoMatriculaListadoDto>(
+            var result = await connection.QueryAsync<MatriculaCarreraListadoDto>(
                 "SELECT * FROM public.up_sel_alumnomatricula_listados_dinamico(@idpromocion, @estado, @idgrupo, @idseccion, @nombrecompleto)",
                 parameters,
                 commandType: CommandType.Text);
@@ -236,73 +236,25 @@ namespace Academic360.Infrastructure.Repositories
             var commandDefinition = new CommandDefinition("SELECT public.up_ins_programacion(@p_idfacultad, @p_idmovimiento, @p_idactor, @p_cantidad, @p_cuota, @p_cuotanumero, @p_cuotas, @p_totalcuotas, @p_idconcepto, @p_idprecio, @p_idmoneda, @p_monto, @p_idmora, @p_fechavencimiento, @p_escontado, @p_esinicial, @p_escuota, @p_esobligatorio, @p_estado, @p_usuariocreacion)", parameters, cancellationToken: cancellationToken);
             await connection.ExecuteAsync(commandDefinition);
         }
+
+        public async Task<IEnumerable<MatriculaCarreraListadoDto>> ObtenerMatriculasPorProductoAsync(int idProducto, FiltroMatriculaEstado estado, string? searchTerm, int? idGrupo, int? idSeccion)
+        {
+            using var connection = await _connectionFactory.CreateConnectionAsync();
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@idproducto", idProducto, DbType.Int32);
+            parameters.Add("@estado", (int)estado, DbType.Int32);
+            parameters.Add("@idgrupo", idGrupo, DbType.Int32);
+            parameters.Add("@idseccion", idSeccion, DbType.Int32);
+            parameters.Add("@nombrecompleto", string.IsNullOrWhiteSpace(searchTerm) ? null : searchTerm, DbType.String);
+
+            // Nota: Reemplaza 'up_sel_alumnomatricula_xproducto' por el nombre exacto de la función en tu base de datos PostgreSQL si difiere
+            var result = await connection.QueryAsync<MatriculaCarreraListadoDto>(
+                "SELECT * FROM public.up_sel_alumnomatricula_xproducto(@idproducto, @estado, @idgrupo, @idseccion, @nombrecompleto)",
+                parameters,
+                commandType: CommandType.Text);
+
+            return result;
+        }
     }
 }
-
-//using Academic360.Application.Alumnos.Interfaces;
-//using Academic360.Application.Common.Interfaces;
-//using Academic360.Application.Matriculas.DTOs;
-//using Academic360.Application.Matriculas.Enums;
-//using Dapper;
-//using System.Data;
-
-//namespace Academic360.Infrastructure.Repositories;
-
-//public class AlumnoMatriculaRepository : IAlumnoMatriculaRepository
-//{
-//    private readonly IDbConnectionFactory _connectionFactory;
-
-//    public AlumnoMatriculaRepository(IDbConnectionFactory connectionFactory)
-//    {
-//        _connectionFactory = connectionFactory;
-//    }
-
-//    public async Task<IEnumerable<AlumnoMatriculaListadoDto>> ObtenerMatriculasAsync(int idPromocion, FiltroMatriculaEstado estado, string? searchTerm, int? idGrupo, int? idSeccion)
-//    {
-//        using var connection = await _connectionFactory.CreateConnectionAsync();
-
-//        var parameters = new DynamicParameters();
-//        parameters.Add("@idpromocion", idPromocion, DbType.Int32);
-//        parameters.Add("@estado", (int)estado, DbType.Int32);
-
-//        if (idGrupo.HasValue)
-//        {
-//            parameters.Add("@idgrupo", idGrupo.Value, DbType.Int32);
-//        }
-
-//        if (idSeccion.HasValue)
-//        {
-//            parameters.Add("@idseccion", idSeccion.Value, DbType.Int32);
-//        }
-
-//        if (!string.IsNullOrWhiteSpace(searchTerm))
-//        {
-//            parameters.Add("@nombrecompleto", searchTerm, DbType.String);
-//        }
-
-//        var result = await connection.QueryAsync<AlumnoMatriculaListadoDto>(
-//            "up_sel_alumnomatricula_listados_dinamico",
-//            parameters,
-//            commandType: CommandType.StoredProcedure);
-
-//        return result;
-//    }
-
-//    public async Task<bool> ActualizarEstadoMatriculaAsync(int idAlumno, int idRegistro, int idMatricula, bool esMatricula)
-//    {
-//        using var connection = await _connectionFactory.CreateConnectionAsync();
-
-//        var parameters = new DynamicParameters();
-//        parameters.Add("@idalumno", idAlumno, DbType.Int32);
-//        parameters.Add("@idregistro", idRegistro, DbType.Int32);
-//        parameters.Add("@idmatricula", idMatricula, DbType.Int32);
-//        parameters.Add("@esmatricula", esMatricula, DbType.Boolean);
-
-//        await connection.ExecuteAsync(
-//            "up_upd_alumnomatricula_esmatricula",
-//            parameters,
-//            commandType: CommandType.StoredProcedure);
-
-//        return true;
-//    }
-//}

@@ -3,7 +3,7 @@ using Academic360.Application.Alumnos.Interfaces;
 using Academic360.Application.Auth.Interfaces;
 using Academic360.Application.Catalogos.Interfaces;
 using Academic360.Application.Common.Interfaces;
-using Academic360.Application.MatriculasCursosLibres.Interfaces;
+using Academic360.Application.Matriculas.CursosLibres.Interfaces;
 using Academic360.Infrastructure.Data;
 using Academic360.Infrastructure.Repositories;
 using Microsoft.Extensions.Configuration;
@@ -27,7 +27,7 @@ public static class DependencyInjection
         services.AddScoped<IAlumnoMatriculaRepository, AlumnoMatriculaRepository>();
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
         services.AddScoped<ICatalogoRepository, CatalogoRepository>();
-        services.AddScoped<IMatriculaCursoLibreRepository, MatriculaCursoLibreRepository>();
+        services.AddScoped<IMatriculaCursosLibresRepository, MatriculaCursoLibreRepository>();
 
         services.AddStackExchangeRedisCache(options =>
         {

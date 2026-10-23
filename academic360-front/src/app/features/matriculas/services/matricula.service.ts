@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
 // --- INTERFACES DE LISTADO Y RESULTADOS ---
-export interface AlumnoMatriculaListadoDto {
+export interface MatriculaCarreraListadoDto {
   idRegistro: number;
   idMatricula: number;
   idAlumno: number;
@@ -16,7 +16,7 @@ export interface AlumnoMatriculaListadoDto {
   esMatricula: boolean;
 }
 
-export interface MatriculaLibreListDto {
+export interface MatriculaCursosLibresListadoDto {
   idRegistro: number;
   idMatricula: number;
   codigo: string;
@@ -84,6 +84,13 @@ export interface BecaDto {
   idBeneficio: number;
   beneficioNombre: string;
   beneficioDescuento: number;
+}
+
+export interface ConceptoPrecioDto {
+  idConcepto: number;
+  idPrecio: number;
+  precioDescripcion: string;
+  precio: number;
 }
 
 // --- INTERFACES DE GUARDADO TRANSACTION SCOPE ---
@@ -194,6 +201,14 @@ export class MatriculaService {
     return this.http.get<BecaDto[]>(`${this.apiCatalogos}/becas/${idPromocion}`);
   }
 
+  obtenerConceptosPrecio(idMoneda: number, idPlan?: number): Observable<ConceptoPrecioDto[]> {
+    let params = new HttpParams().set('idMoneda', idMoneda.toString());
+    if (idPlan) {
+      params = params.set('idPlan', idPlan.toString());
+    }
+    return this.http.get<ConceptoPrecioDto[]>(`${this.apiCatalogos}/conceptos-precio`, { params });
+  }
+
   // --- MÉTODOS DE MATRÍCULAS ---
   obtenerPorPromocion(
     idPromocion: number,
@@ -201,7 +216,7 @@ export class MatriculaService {
     searchTerm: string = '',
     pageNumber: number = 1,
     pageSize: number = 10
-  ): Observable<PagedResult<AlumnoMatriculaListadoDto>> {
+  ): Observable<PagedResult<MatriculaCarreraListadoDto>> {
     let params = new HttpParams()
       .set('estado', estado.toString())
       .set('pageNumber', pageNumber.toString())
@@ -211,7 +226,7 @@ export class MatriculaService {
       params = params.set('searchTerm', searchTerm);
     }
 
-    return this.http.get<PagedResult<AlumnoMatriculaListadoDto>>(`${this.apiMatriculas}/promocion/${idPromocion}`, { params });
+    return this.http.get<PagedResult<MatriculaCarreraListadoDto>>(`${this.apiMatriculas}/promocion/${idPromocion}`, { params });
   }
 
   actualizarEstado(idAlumno: number, idRegistro: number, idMatricula: number, esMatricula: boolean): Observable<any> {
@@ -238,8 +253,28 @@ export class MatriculaService {
     return this.http.post<any>(this.apiMatriculasLibres, command);
   }
 
-  listarMatriculasLibres(filtro: string = ''): Observable<MatriculaLibreListDto[]> {
+  listarMatriculasLibres(filtro: string = ''): Observable<MatriculaCursosLibresListadoDto[]> {
     const params = new HttpParams().set('filtro', filtro);
-    return this.http.get<MatriculaLibreListDto[]>(this.apiMatriculasLibres, { params });
+    return this.http.get<MatriculaCursosLibresListadoDto[]>(this.apiMatriculasLibres, { params });
   }
+
+  obtenerPorProducto(
+    idProducto: number,
+    estado: number,
+    searchTerm: string = '',
+    pageNumber: number = 1,
+    pageSize: number = 10
+  ): Observable<PagedResult<MatriculaCarreraListadoDto>> {
+    let params = new HttpParams()
+      .set('estado', estado.toString())
+      .set('pageNumber', pageNumber.toString())
+      .set('pageSize', pageSize.toString());
+
+    if (searchTerm) {
+      params = params.set('searchTerm', searchTerm);
+    }
+
+    return this.http.get<PagedResult<MatriculaCarreraListadoDto>>(`${this.apiMatriculas}/producto/${idProducto}`, { params });
+  }
+
 }

@@ -3,12 +3,12 @@ using System.Data;
 using System.Threading.Tasks;
 using Dapper;
 using Academic360.Application.Common.Interfaces;
-using Academic360.Application.MatriculasCursosLibres.DTOs;
-using Academic360.Application.MatriculasCursosLibres.Interfaces;
+using Academic360.Application.Matriculas.CursosLibres.DTOs;
+using Academic360.Application.Matriculas.CursosLibres.Interfaces;
 
 namespace Academic360.Infrastructure.Repositories
 {
-    public class MatriculaCursoLibreRepository : IMatriculaCursoLibreRepository
+    public class MatriculaCursoLibreRepository : IMatriculaCursosLibresRepository
     {
         private readonly IDbConnectionFactory _connectionFactory;
 
@@ -26,33 +26,20 @@ namespace Academic360.Infrastructure.Repositories
             return idMatricula;
         }
 
-        public async Task<IEnumerable<MatriculaLibreListDto>> ObtenerListadoAsync(string filtro)
+        public async Task<IEnumerable<MatriculaCursosLibresListadoDto>> ObtenerListadoAsync(string filtro)
         {
             using var connection = await _connectionFactory.CreateConnectionAsync();
 
-            var sql = @"
-                SELECT 
-                    am.idregistro AS ""IdRegistro"",
-                    am.idmatricula AS ""IdMatricula"",
-                    a.codigo AS ""Codigo"",
-                    (a.paterno || ' ' || COALESCE(a.materno, '') || ' ' || a.nombres) AS ""Alumno"",
-                    COALESCE(c.cursonombre, p.promocionnombre) AS ""Curso"",
-                    TO_CHAR(am.matriculafecha, 'DD/MM/YYYY') AS ""Fecha""
-                FROM public.alumnomatricula am
-                INNER JOIN public.actor a ON am.idalumno = a.idactor
-                INNER JOIN public.promocion p ON am.idpromocion = p.idpromocion
-                LEFT JOIN public.alumnocurso ac ON am.idalumno = ac.idalumno AND am.idregistro = ac.idregistro
-                LEFT JOIN public.curso c ON ac.idcurso = c.idcurso
-                WHERE EXTRACT(YEAR FROM am.matriculafecha) = 2026
-                  AND (@Filtro = '' OR a.codigo ILIKE '%' || @Filtro || '%' OR (a.paterno || ' ' || a.nombres) ILIKE '%' || @Filtro || '%')
-                ORDER BY am.matriculafecha DESC;
-            ";
+            // Se reemplaza la consulta inyectada por el llamado a la función PostgreSQL
+            var sql = "SELECT * FROM public.up_sel_matriculacursolibre_listado(@Filtro)";
 
             var parameters = new DynamicParameters();
             parameters.Add("@Filtro", filtro ?? string.Empty, DbType.String);
 
-            var resultado = await connection.QueryAsync<MatriculaLibreListDto>(sql, parameters);
+            var resultado = await connection.QueryAsync<MatriculaCursosLibresListadoDto>(sql, parameters);
             return resultado;
         }
+
+   
     }
 }

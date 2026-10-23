@@ -124,7 +124,6 @@ namespace Academic360.Infrastructure.Repositories
             parameters.Add("@p_idproducto", idProducto, DbType.Int32);
             parameters.Add("@p_texto", texto ?? string.Empty, DbType.String);
 
-            // Mapeo forzado con comillas dobles para coincidir exactamente con el DTO en PascalCase
             return await connection.QueryAsync<CursoDisponibleDto>(
                 @"SELECT 
                     idmodulo AS ""IdModulo"", 
@@ -138,5 +137,38 @@ namespace Academic360.Infrastructure.Repositories
                 commandType: CommandType.Text,
                 commandTimeout: 60);
         }
+
+        public async Task<IEnumerable<ConceptoPrecioDto>> ObtenerConceptosPrecioAsync(int idMoneda, int? idPlan)
+        {
+            using var connection = await _connectionFactory.CreateConnectionAsync();
+
+            var sql = "SELECT * FROM public.up_sel_conceptoprecio_xidmoneda_xidplan(@IdMoneda, @IdPlan)";
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@IdMoneda", idMoneda, DbType.Int32);
+            parameters.Add("@IdPlan", idPlan, DbType.Int32); // Dapper maneja automáticamente los nulos aquí
+
+            return await connection.QueryAsync<ConceptoPrecioDto>(sql, parameters);
+        }
+
+        //public async Task<IEnumerable<ConceptoPrecioDto>> ObtenerConceptosPrecioAsync(int idMoneda, int? idPlan)
+        //{
+        //    using var connection = await _connectionFactory.CreateConnectionAsync();
+        //    var sql = @"
+        //        SELECT 
+        //            cp.idconcepto AS ""IdConcepto"",
+        //            cp.idprecio AS ""IdPrecio"",
+        //            cp.preciodescripcion AS ""PrecioDescripcion"",
+        //            cp.precio AS ""Precio""
+        //        FROM public.conceptoprecio cp
+        //        INNER JOIN public.concepto c ON cp.idconcepto = c.idconcepto
+        //        WHERE cp.activo = true 
+        //          AND cp.idmoneda = @IdMoneda
+        //          AND (@IdPlan IS NULL OR cp.idplan = @IdPlan)
+        //        ORDER BY cp.conceptoorden, cp.preciodescripcion;
+        //    ";
+
+        //    return await connection.QueryAsync<ConceptoPrecioDto>(sql, new { IdMoneda = idMoneda, IdPlan = idPlan });
+        //}
     }
 }

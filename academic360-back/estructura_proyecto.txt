@@ -73,29 +73,35 @@ Analizando: academic360-back
 │   │   │   └── 📂 Models
 │   │   │       └── 📄 PagedResult.cs
 │   │   ├── 📂 Matriculas
-│   │   │   ├── 📂 Commands
-│   │   │   │   ├── 📂 ActualizarEstadoMatricula
-│   │   │   │   │   └── 📄 ActualizarEstadoMatriculaCommand.cs
-│   │   │   │   └── 📂 RegistrarMatricula
-│   │   │   │       ├── 📄 RegistrarMatriculaCommand.cs
-│   │   │   │       └── 📄 RegistrarMatriculaCommandHandler.cs
-│   │   │   ├── 📂 DTOs
-│   │   │   │   └── 📄 AlumnoMatriculaListadoDto.cs
-│   │   │   ├── 📂 Enums
-│   │   │   │   └── 📄 FiltroMatriculaEstado.cs
-│   │   │   └── 📂 Queries
-│   │   │       └── 📂 GetMatriculasByPromocion
-│   │   │           ├── 📄 GetMatriculasByPromocionQuery.cs
-│   │   │           └── 📄 GetMatriculasByPromocionQueryHandler.cs
-│   │   ├── 📂 MatriculasCursosLibres
-│   │   │   ├── 📂 Commands
-│   │   │   │   └── 📂 CrearMatricula
-│   │   │   │       ├── 📄 CrearMatriculaCommand.cs
-│   │   │   │       └── 📄 CrearMatriculaCommandHandler.cs
-│   │   │   ├── 📂 DTOs
-│   │   │   │   └── 📄 CrearMatriculaRequestDto.cs
-│   │   │   └── 📂 Interfaces
-│   │   │       └── 📄 IMatriculaCursoLibreRepository.cs
+│   │   │   ├── 📂 Carrera
+│   │   │   │   ├── 📂 Commands
+│   │   │   │   │   ├── 📂 ActualizarEstadoMatricula
+│   │   │   │   │   │   └── 📄 ActualizarEstadoMatriculaCommand.cs
+│   │   │   │   │   └── 📂 RegistrarMatricula
+│   │   │   │   │       ├── 📄 RegistrarMatriculaCommand.cs
+│   │   │   │   │       └── 📄 RegistrarMatriculaCommandHandler.cs
+│   │   │   │   ├── 📂 DTOs
+│   │   │   │   │   └── 📄 AlumnoMatriculaListadoDto.cs
+│   │   │   │   ├── 📂 Enums
+│   │   │   │   │   └── 📄 FiltroMatriculaEstado.cs
+│   │   │   │   └── 📂 Queries
+│   │   │   │       └── 📂 GetMatriculasByPromocion
+│   │   │   │           ├── 📄 GetMatriculasByPromocionQuery.cs
+│   │   │   │           └── 📄 GetMatriculasByPromocionQueryHandler.cs
+│   │   │   └── 📂 CursosLibres
+│   │   │       ├── 📂 Commands
+│   │   │       │   └── 📂 CrearMatricula
+│   │   │       │       ├── 📄 CrearMatriculaCommand.cs
+│   │   │       │       └── 📄 CrearMatriculaCommandHandler.cs
+│   │   │       ├── 📂 DTOs
+│   │   │       │   ├── 📄 CrearMatriculaRequestDto.cs
+│   │   │       │   └── 📄 MatriculaLibreListDto.cs
+│   │   │       ├── 📂 Interfaces
+│   │   │       │   └── 📄 IMatriculaCursoLibreRepository.cs
+│   │   │       └── 📂 Queries
+│   │   │           └── 📂 ObtenerMatriculasCursosLibres
+│   │   │               ├── 📄 ObtenerMatriculasCursosLibresQuery.cs
+│   │   │               └── 📄 ObtenerMatriculasCursosLibresQueryHandler.cs
 │   │   └── 📄 DependencyInjection.cs
 │   ├── 📂 Academic360.Domain
 │   │   ├── 📂 Actores

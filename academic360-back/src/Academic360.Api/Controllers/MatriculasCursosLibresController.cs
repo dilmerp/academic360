@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using System.Threading.Tasks;
-using Academic360.Application.MatriculasCursosLibres.DTOs;
-using Academic360.Application.MatriculasCursosLibres.Commands.CrearMatricula;
-using Academic360.Application.MatriculasCursosLibres.Queries.ObtenerMatriculasCursosLibres;
+using Academic360.Application.Matriculas.CursosLibres.Commands.CrearMatricula;
+using Academic360.Application.Matriculas.CursosLibres.Queries.ObtenerMatriculasCursosLibres;
 using Microsoft.AspNetCore.Authorization;
+using Academic360.Application.Matriculas.CursosLibres.DTOs;
 
 namespace Academic360.Api.Controllers
 {
@@ -21,12 +21,12 @@ namespace Academic360.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CrearMatricula([FromBody] CrearMatriculaRequestDto request)
+        public async Task<IActionResult> CrearMatricula([FromBody] RegistrarMatriculaRequestDto request)
         {
             // El ID del usuario que registra se puede inyectar desde el Token JWT usando tu servicio IUsuarioActual
             // request.UsuarioCreacion = _usuarioActual.Id;
 
-            var command = new CrearMatriculaCommand(request);
+            var command = new RegistrarMatriculaCommand(request);
             var idMatricula = await _mediator.Send(command);
 
             return Ok(new { message = "Matrícula registrada con éxito", idMatricula });
