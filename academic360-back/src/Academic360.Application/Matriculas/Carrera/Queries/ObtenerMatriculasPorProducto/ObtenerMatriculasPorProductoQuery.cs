@@ -1,7 +1,7 @@
 ﻿using Academic360.Application.Common.Models;
-using Academic360.Application.Alumnos.Interfaces;
 using MediatR;
 using Academic360.Application.Matriculas.Carrera.DTOs;
+using Academic360.Application.Matriculas.Carrera.Interfaces;
 
 namespace Academic360.Application.Matriculas.Carrera.Queries.ObtenerMatriculasPorProducto;
 

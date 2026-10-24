@@ -1,8 +1,8 @@
-﻿using Academic360.Application.Alumnos.Interfaces;
-using Academic360.Application.Common.Interfaces;
+﻿using Academic360.Application.Common.Interfaces;
 using Academic360.Application.Matriculas.Carrera.Commands.RegistrarMatricula;
 using Academic360.Application.Matriculas.Carrera.DTOs;
 using Academic360.Application.Matriculas.Carrera.Enums;
+using Academic360.Application.Matriculas.Carrera.Interfaces;
 using Dapper;
 using System.Collections.Generic;
 using System.Data;
@@ -27,9 +27,7 @@ namespace Academic360.Infrastructure.Repositories
             parameters.Add("@idpromocion", idPromocion, DbType.Int32);
             parameters.Add("@estado", (int)estado, DbType.Int32);
 
-            // CORRECCIÓN PARA POSTGRESQL (CommandType.Text): 
-            // Siempre debemos agregar todos los parámetros a DynamicParameters, incluso si son nulos, 
-            // porque la consulta SQL plana los referencia explícitamente en la llamada a la función.
+
             parameters.Add("@idgrupo", idGrupo, DbType.Int32);
             parameters.Add("@idseccion", idSeccion, DbType.Int32);
             parameters.Add("@nombrecompleto", string.IsNullOrWhiteSpace(searchTerm) ? null : searchTerm, DbType.String);
@@ -73,7 +71,7 @@ namespace Academic360.Infrastructure.Repositories
                 parameters.Add("@p_materno", request.Materno);
                 parameters.Add("@p_nombres", request.Nombres);
                 parameters.Add("@p_idtenor", request.IdTenor);
-                parameters.Add("@p_sexo", request.Sexo); // Dapper enviará el bool
+                parameters.Add("@p_sexo", request.Sexo); 
                 parameters.Add("@p_iddocumento", request.IdDocumento);
                 parameters.Add("@p_numerodocumento", request.NumeroDocumento);
                 parameters.Add("@p_idcivil", request.IdCivil);
@@ -88,7 +86,7 @@ namespace Academic360.Infrastructure.Repositories
                 parameters.Add("@p_idperiodo", request.IdPeriodo);
                 parameters.Add("@p_usuariocreacion", request.UsuarioCreacion);
 
-                // Agregamos ::boolean a @p_sexo
+
                 var commandDefinition = new CommandDefinition("SELECT public.up_ins_actor_xmatricula(@p_contrasena, @p_paterno, @p_materno, @p_nombres, @p_idtenor, @p_sexo::boolean, @p_iddocumento, @p_numerodocumento, @p_idcivil, @p_direccion, @p_urbanizacion, @p_idpais, @p_idubigeo, @p_telefono, @p_celular, @p_fax, @p_email, @p_idperiodo, @p_usuariocreacion)", parameters, cancellationToken: cancellationToken);
                 return await connection.QuerySingleAsync<string>(commandDefinition);
             }
@@ -100,7 +98,7 @@ namespace Academic360.Infrastructure.Repositories
                 parameters.Add("@p_materno", request.Materno);
                 parameters.Add("@p_nombres", request.Nombres);
                 parameters.Add("@p_idtenor", request.IdTenor);
-                parameters.Add("@p_sexo", request.Sexo); // Dapper enviará el bool
+                parameters.Add("@p_sexo", request.Sexo); 
                 parameters.Add("@p_iddocumento", request.IdDocumento);
                 parameters.Add("@p_numerodocumento", request.NumeroDocumento);
                 parameters.Add("@p_idcivil", request.IdCivil);
@@ -114,7 +112,7 @@ namespace Academic360.Infrastructure.Repositories
                 parameters.Add("@p_email", request.Email);
                 parameters.Add("@p_usuariomodificacion", request.UsuarioCreacion);
 
-                // Agregamos ::boolean a @p_sexo
+
                 var commandDefinition = new CommandDefinition("SELECT public.up_upd_actor_xmatricula(@p_idactor, @p_paterno, @p_materno, @p_nombres, @p_idtenor, @p_sexo::boolean, @p_iddocumento, @p_numerodocumento, @p_idcivil, @p_direccion, @p_urbanizacion, @p_idpais, @p_idubigeo, @p_telefono, @p_celular, @p_fax, @p_email, @p_usuariomodificacion)", parameters, cancellationToken: cancellationToken);
                 await connection.ExecuteAsync(commandDefinition);
                 return $"{request.IdAlumno}|{request.NumeroDocumento}";
@@ -173,10 +171,10 @@ namespace Academic360.Infrastructure.Repositories
             parameters.Add("@p_idgrupo", request.IdGrupo);
             parameters.Add("@p_idcurso", curso.IdCurso);
             parameters.Add("@p_idseccion", curso.IdSeccion);
-            parameters.Add("@p_esmatricula", false); // Dapper enviará el bool
+            parameters.Add("@p_esmatricula", false); 
             parameters.Add("@p_usuariocreacion", request.UsuarioCreacion);
 
-            // Agregamos ::boolean a @p_esmatricula
+   
             var commandDefinition = new CommandDefinition("SELECT public.up_ins_alumnocurso(@p_idalumno, @p_idregistro, @p_idmatricula, @p_idproducto, @p_idpromocion, @p_idgrupo, @p_idcurso, @p_idseccion, @p_esmatricula::boolean, @p_usuariocreacion)", parameters, cancellationToken: cancellationToken);
             return await connection.QuerySingleAsync<int>(commandDefinition);
         }
@@ -248,8 +246,7 @@ namespace Academic360.Infrastructure.Repositories
             parameters.Add("@idseccion", idSeccion, DbType.Int32);
             parameters.Add("@nombrecompleto", string.IsNullOrWhiteSpace(searchTerm) ? null : searchTerm, DbType.String);
 
-            // Nota: Reemplaza 'up_sel_alumnomatricula_xproducto' por el nombre exacto de la función en tu base de datos PostgreSQL si difiere
-            var result = await connection.QueryAsync<MatriculaCarreraListadoDto>(
+             var result = await connection.QueryAsync<MatriculaCarreraListadoDto>(
                 "SELECT * FROM public.up_sel_alumnomatricula_xproducto(@idproducto, @estado, @idgrupo, @idseccion, @nombrecompleto)",
                 parameters,
                 commandType: CommandType.Text);

@@ -1,4 +1,5 @@
 ﻿using Academic360.Application.Catalogos.Interfaces;
+using Academic360.Application.Catalogos.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -77,8 +78,6 @@ public class CatalogosController : ControllerBase
     [HttpGet("becas/{idPromocion}")]
     public async Task<ActionResult<IEnumerable<BecaDto>>> GetBecas(int idPromocion)
     {
-        // En este diseño la beca no requiere idPromocion en la BD, 
-        // pero se mantiene el parámetro en la ruta para no romper el servicio Angular.
         var result = await _repository.ObtenerBecasActivasAsync();
         return Ok(result);
     }

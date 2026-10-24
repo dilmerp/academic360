@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using System.Transactions;
-using Academic360.Application.Alumnos.Interfaces;
+using Academic360.Application.Matriculas.Carrera.Interfaces;
 
 namespace Academic360.Application.Matriculas.Carrera.Commands.RegistrarMatricula
 {

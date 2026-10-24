@@ -62,7 +62,6 @@ public class MatriculasController : ControllerBase
     [HttpPut("estado")]
     public async Task<ActionResult> ActualizarEstado([FromBody] ActualizarEstadoMatriculaCommand command)
     {
-        // Validar que los IDs sean válidos
         if (command.IdAlumno <= 0 || command.IdRegistro <= 0 || command.IdMatricula <= 0)
         {
             return BadRequest("Los identificadores proporcionados no son válidos.");
@@ -100,7 +99,7 @@ public class MatriculasController : ControllerBase
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10)
     {
-        // Se instancia el Request (terminado en QueryHandler según tu convención)
+
         var query = new ObtenerMatriculasPorProductoQueryHandler
         {
             IdProducto = idProducto,

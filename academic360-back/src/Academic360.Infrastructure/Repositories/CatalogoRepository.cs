@@ -1,5 +1,6 @@
 ﻿using Academic360.Application.Catalogos.Interfaces;
 using Academic360.Application.Common.Interfaces;
+using Academic360.Application.Catalogos.DTOs;
 using Dapper;
 using System.Collections.Generic;
 using System.Data;
@@ -146,29 +147,11 @@ namespace Academic360.Infrastructure.Repositories
 
             var parameters = new DynamicParameters();
             parameters.Add("@IdMoneda", idMoneda, DbType.Int32);
-            parameters.Add("@IdPlan", idPlan, DbType.Int32); // Dapper maneja automáticamente los nulos aquí
+            parameters.Add("@IdPlan", idPlan, DbType.Int32); 
 
             return await connection.QueryAsync<ConceptoPrecioDto>(sql, parameters);
         }
 
-        //public async Task<IEnumerable<ConceptoPrecioDto>> ObtenerConceptosPrecioAsync(int idMoneda, int? idPlan)
-        //{
-        //    using var connection = await _connectionFactory.CreateConnectionAsync();
-        //    var sql = @"
-        //        SELECT 
-        //            cp.idconcepto AS ""IdConcepto"",
-        //            cp.idprecio AS ""IdPrecio"",
-        //            cp.preciodescripcion AS ""PrecioDescripcion"",
-        //            cp.precio AS ""Precio""
-        //        FROM public.conceptoprecio cp
-        //        INNER JOIN public.concepto c ON cp.idconcepto = c.idconcepto
-        //        WHERE cp.activo = true 
-        //          AND cp.idmoneda = @IdMoneda
-        //          AND (@IdPlan IS NULL OR cp.idplan = @IdPlan)
-        //        ORDER BY cp.conceptoorden, cp.preciodescripcion;
-        //    ";
-
-        //    return await connection.QueryAsync<ConceptoPrecioDto>(sql, new { IdMoneda = idMoneda, IdPlan = idPlan });
-        //}
+        
     }
 }

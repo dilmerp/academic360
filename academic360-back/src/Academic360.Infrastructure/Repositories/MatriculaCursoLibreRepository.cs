@@ -30,7 +30,6 @@ namespace Academic360.Infrastructure.Repositories
         {
             using var connection = await _connectionFactory.CreateConnectionAsync();
 
-            // Se reemplaza la consulta inyectada por el llamado a la función PostgreSQL
             var sql = "SELECT * FROM public.up_sel_matriculacursolibre_listado(@Filtro)";
 
             var parameters = new DynamicParameters();

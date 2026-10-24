@@ -17,10 +17,9 @@ namespace Academic360.Application.Matriculas.CursosLibres.Commands.CrearMatricul
 
         public async Task<int> Handle(RegistrarMatriculaCommand request, CancellationToken cancellationToken)
         {
-            // Serializamos el DTO a JSON para aprovechar la potencia de PostgreSQL JSONB
+            // Serializar el DTO a JSON (PostgreSQL JSONB)
             var matriculaJson = JsonSerializer.Serialize(request.Matricula);
 
-            // Llamamos a la BD una sola vez
             var idMatricula = await _repository.RegistrarMatriculaCompletaAsync(matriculaJson);
 
             return idMatricula;

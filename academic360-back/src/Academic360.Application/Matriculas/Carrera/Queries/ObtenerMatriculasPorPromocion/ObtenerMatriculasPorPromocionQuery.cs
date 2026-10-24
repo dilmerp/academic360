@@ -1,7 +1,7 @@
 ﻿using Academic360.Application.Common.Models;
-using Academic360.Application.Alumnos.Interfaces;
 using MediatR;
 using Academic360.Application.Matriculas.Carrera.DTOs;
+using Academic360.Application.Matriculas.Carrera.Interfaces;
 
 namespace Academic360.Application.Matriculas.Carrera.Queries.GetMatriculasByPromocion;
 
@@ -16,7 +16,7 @@ public class ObtenerMatriculasPorPromocionQuery : IRequestHandler<ObtenerMatricu
 
     public async Task<PagedResult<MatriculaCarreraListadoDto>> Handle(ObtenerMatriculasPorPromocionQueryHandler request, CancellationToken cancellationToken)
     {
-        // Pasamos explícitamente null a los parámetros de grupo y sección que aún no usamos
+
         var matriculas = await _repository.ObtenerMatriculasAsync(
             request.IdPromocion,
             request.Estado,

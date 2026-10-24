@@ -62,7 +62,6 @@ namespace Academic360.Api.Controllers
                     }
                     catch
                     {
-                        // Si falla una (ej. no era un hex válido), continuamos con la siguiente
                         continue;
                     }
                 }

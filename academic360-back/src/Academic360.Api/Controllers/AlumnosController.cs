@@ -33,12 +33,10 @@ namespace Academic360.Api.Controllers
         }
 
         [HttpPost]
-        // CORRECCIÓN OWASP A01: Solo administradores o personal autorizado pueden crear alumnos.
-        // Nota: Requiere que en el LoginCommandHandler agregues un Claim de tipo ClaimTypes.Role
         // [Authorize(Roles = "Administrador,Secretaria")] 
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)] // Añadido para rechazos por falta de permisos
+        [ProducesResponseType(StatusCodes.Status403Forbidden)] // Rechazos por falta de permisos
         public async Task<IActionResult> CrearAlumno([FromBody] CrearAlumnoRequestDto request, [FromQuery] bool forceHomologo = false)
         {
             try
@@ -63,11 +61,11 @@ namespace Academic360.Api.Controllers
         {
             try
             {
-                // CORRECCIÓN OWASP A01 (IDOR): Extraer quién es el usuario que hace la petición
+                // OWASP A01 (IDOR): Extraer quién es el usuario que hace la petición
                 var idUsuarioActualString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                // REGLA DE NEGOCIO: Si eres alumno, solo puedes ver tu propio ID. 
-                // Si eres Admin, puedes ver cualquiera. (Lógica pseudo-código para tu equipo)
+                // REGLA DE NEGOCIO: Si es alumno, solo puedes ver tu propio ID. 
+                // Si es Admin, puedes ver cualquiera. (Lógica pseudo-código para tu equipo)
                 /*
                 if (!User.IsInRole("Administrador") && idUsuarioActualString != id.ToString())
                 {
@@ -105,8 +103,6 @@ namespace Academic360.Api.Controllers
         [ProducesResponseType(typeof(PagedResult<AlumnoListadoDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Listar([FromQuery] string? filtroGlobal = "", [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            //throw new Exception("Simulando una caída catastrófica del sistema");
-
             var query = new ObtenerAlumnosPorCriterioQuery
             {
                 FiltroGlobal = filtroGlobal ?? string.Empty,
@@ -146,8 +142,7 @@ namespace Academic360.Api.Controllers
         {
             try
             {
-                // Aquí también aplica la prevención IDOR: ¿Puede el alumno actualizar su propia matrícula o es exclusivo de Tesorería/Admin?
-                var command = new ActualizarEstadoMatriculaCommand(idAlumno, idRegistro, idMatricula, request.EsMatricula);
+                 var command = new ActualizarEstadoMatriculaCommand(idAlumno, idRegistro, idMatricula, request.EsMatricula);
                 await _mediator.Send(command);
 
                 return NoContent();

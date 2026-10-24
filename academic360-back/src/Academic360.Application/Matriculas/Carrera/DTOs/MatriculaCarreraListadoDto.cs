@@ -1,6 +1,5 @@
 ﻿namespace Academic360.Application.Matriculas.Carrera.DTOs;
 
-// Asegúrate de que tenga la palabra "public" antes de "class"
 public class MatriculaCarreraListadoDto
 {
     public int IdRegistro { get; set; }

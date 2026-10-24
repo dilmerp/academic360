@@ -1,4 +1,4 @@
-﻿using Academic360.Application.Alumnos.Interfaces;
+﻿using Academic360.Application.Matriculas.Carrera.Interfaces;
 using MediatR;
 
 namespace Academic360.Application.Alumnos.Commands.ActualizarEstadoMatricula;

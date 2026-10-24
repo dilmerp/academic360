@@ -29,7 +29,7 @@ builder.Host.UseSerilog((context, configuration) =>
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-    // Se limpian las redes conocidas asumiendo confianza en la red interna del clúster
+    // Limpiar las redes conocidas asumiendo confianza en la red interna del clúster
     options.KnownNetworks.Clear();
     options.KnownProxies.Clear();
 });
@@ -46,7 +46,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
 {
-    // Agrega esta línea para resolver el conflicto de nombres (SchemaId) en los DTOs
+    // Resolver el conflicto de nombres (SchemaId) en los DTOs
     c.CustomSchemaIds(type => type.FullName);
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -76,7 +76,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // --- Registro del Manejador Global de Excepciones ---
-builder.Services.AddProblemDetails(); // Mitiga Information Disclosure
+builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 // --- OWASP A04: Rate Limiting ---
@@ -84,7 +84,7 @@ builder.Services.AddRateLimiter(options =>
 {
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
         RateLimitPartition.GetFixedWindowLimiter(
-            // Ahora RemoteIpAddress devolverá la IP real gracias a UseForwardedHeaders
+            // RemoteIpAddress devolverá la IP real gracias a UseForwardedHeaders
             partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? httpContext.Request.Headers.Host.ToString(),
             factory: partition => new FixedWindowRateLimiterOptions
             {
@@ -158,10 +158,8 @@ if (!builder.Environment.IsDevelopment())
 
 var app = builder.Build();
 
-// ==========================================
+
 // CONFIGURACIÓN DEL PIPELINE HTTP (MIDDLEWARES)
-// ¡El orden es crítico por razones de seguridad!
-// ==========================================
 
 // 1. Resolver la IP real del cliente (Debe ir primero para que los logs y rate limit lo vean)
 app.UseForwardedHeaders();
@@ -185,13 +183,13 @@ else
     // Nota de AppSec: No usamos UseHttpsRedirection() aquí asumiendo que 
     // la infraestructura (Nginx/Azure) maneja el certificado HTTPS (TLS Termination) 
     // y redirige el tráfico interno por HTTP al contenedor Docker. 
-    // Si expones el contenedor directo a Internet, debes habilitarlo.
+    // Habilitar Si expones el contenedor directo a Internet
 }
 
 // 4. --- OWASP A05: Cabeceras de Seguridad Básicas (Refactorizado) ---
 app.Use(async (context, next) =>
 {
-    // OnStarting asegura que las cabeceras se inyecten de forma segura 
+    // OnStarting asegurar que las cabeceras se inyecten de forma segura 
     // antes de que cualquier controlador empiece a escribir la respuesta.
     context.Response.OnStarting(() =>
     {
